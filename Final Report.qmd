@@ -1,0 +1,39 @@
+---
+title: "Associations of Healthcare Costs and Early Detection with Colorectal Cancer Mortality in the USA"
+author: "Yulin Yuan, Ruohan Sun, Tony Lee"
+format: pdf
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(car)
+library(leaps)
+library(tidyverse)
+library(broom)
+```
+
+```{r}
+#| echo: false
+# Read the CSV file
+data <- read.csv("data/colorectal_cancer_dataset.csv")
+
+# Select the data in USA
+usa_data <- data %>%
+  filter(Country == "USA")
+
+# Remove Patient_ID and Country
+colorectal_usa <- usa_data %>%
+  select(-Patient_ID, -Country)
+```
