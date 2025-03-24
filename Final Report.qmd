@@ -5,19 +5,12 @@ format: pdf
 editor: visual
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
 
+#Loading library
 library(car)
 library(leaps)
 library(tidyverse)
@@ -37,3 +30,95 @@ usa_data <- data %>%
 colorectal_usa <- usa_data %>%
   select(-Patient_ID, -Country)
 ```
+
+## Introduction
+
+### Study Objective
+
+Clearly define the research questions or objectives.
+
+### Dataset Overview
+
+Describe:
+
+-   Where the data comes from
+
+-   What each variable represents
+
+-   How the data was collected (if known)
+
+### Motivation
+
+Why is this question or data important/interesting?
+
+## Analysis
+
+### Exploratory Data Analysis (EDA)
+
+#### Data Visualizations
+
+```{r}
+
+```
+
+#### Summary Correlations
+
+```{r}
+
+```
+
+#### Interpretation of Findings
+
+Pattern, trends, suggested operations
+
+### Model Choice and Reasoning
+
+#### Linear Regression
+
+explain why choose this model based on EDA and Data description
+
+#### Data Transformations
+
+```{r}
+
+```
+
+#### Model Selection
+
+```{r}
+
+```
+
+### Statistical Analysis
+
+```{r}
+
+```
+
+### Results Interpretation
+
+inference results
+
+## Conclusion
+
+### Main Findings
+
+Interpreting result in real-world context, careful about causality
+
+### Limitations
+
+-   Discuss possible sources of bias, limitations in data, model assumptions
+
+-   Suggest improvements or next steps
+
+### Potential Further research
+
+Mention anything interesting you found that doesn’t fit elsewhere
+
+## Appendix
+
+-   Full regression output
+
+-   Extra plots or tables not essential to the main body
+
+-   Model selection steps
