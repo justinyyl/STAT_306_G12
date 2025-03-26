@@ -4,6 +4,7 @@ library(leaps)
 library(tidyverse)
 library(broom)
 library(GGally)
+library(patchwork)
 
 # Read the CSV file
 data <- read.csv("data/colorectal_cancer_dataset.csv")
@@ -16,9 +17,9 @@ usa_data <- data %>%
 colorectal_usa <- usa_data %>%
   select(-Patient_ID, -Country, -Tumor_Size_mm)
 
-# Sampling 2,000 observations
+# Sampling 10% observations
 set.seed(42)  # for reproducibility
-colorectal_usa <- colorectal_usa[sample(nrow(colorectal_usa), 1000), ]
+colorectal_usa <- colorectal_usa[sample(nrow(colorectal_usa), nrow(colorectal_usa)/10), ]
 
 # Set response variable
 resp <- "Mortality_Rate_per_100K"
