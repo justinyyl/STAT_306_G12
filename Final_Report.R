@@ -145,7 +145,7 @@ for (i in seq_along(continuous)) {
 combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 2))
 
 caption_grob <- textGrob("Figure 2: Distribution of continuous variables by mortality status",
-                         gp = gpar(fontface = "bold.italic", fontsize = 23), 
+                         gp = gpar(fontface = "bold.italic", fontsize = 24), 
                          hjust = 0.5,
                          vjust = 0.3)
 
@@ -187,6 +187,81 @@ caption_grob <- textGrob("Figure 3: Proportion Bar plots for Categorical variabl
                          gp = gpar(fontface = "bold.italic", fontsize = 62), 
                          hjust = 0.5,
                          vjust = 0.3)
+
+final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
+
+as.ggplot(final_plot)
+
+# Fit the full logistic regression model with all predictors
+full_model <- glm(Mortality ~ ., data = balanced_data, family = binomial)
+
+# Check for duplicate rows
+dup_check <- any(duplicated(balanced_data)) 
+
+# Compute predicted probabilities
+fitted_probs <- fitted(full_model)
+
+# Compute binomial variances
+binomial_var <- fitted_probs * (1 - fitted_probs)
+
+# Create the base plot
+variance_plot <- ggplot(data.frame(fitted_probs, binomial_var), aes(x = fitted_probs, y = binomial_var)) +
+  geom_point(color = "darkgreen", alpha = 0.6) +
+  geom_vline(xintercept = 0.5, linetype = "dashed", color = "red") +
+  labs(
+    x = expression("Predicted Probability (" * hat(pi) * ")"),
+    y = expression("Binomial Variance " * hat(pi) * " (1 - " * hat(pi) * ")"),
+    title = "Variance Structure in Logistic Regression"
+  ) +
+ scale_x_continuous(
+  breaks = seq(0.45, 0.55, by = 0.01), limits = c(0.44, 0.56)) +
+  theme_minimal(base_size = 16)
+
+caption_grob <- textGrob("Figure 4: Variance peaks at predicted probability = 0.5.",
+                         gp = gpar(fontface = "bold.italic", fontsize = 24), 
+                         hjust = 0.5, vjust = 0.3)
+
+final_plot <- arrangeGrob(variance_plot, bottom = caption_grob)
+
+as.ggplot(final_plot)
+
+# Get the logit (link) values
+logit_vals <- predict(full_model, type = "link")
+
+# Create list to store plots
+logit_plot_list <- list()
+
+# Loop over each continuous variable
+for (i in seq_along(continuous)) {
+  feat <- continuous[i]
+  label <- numeric_cols[i]
+
+  p <- ggplot(balanced_data, aes_string(x = feat, y = logit_vals)) +
+    geom_point(alpha = 0.4, color = "darkblue") +
+    geom_smooth(method = "loess", color = "red", se = FALSE, linetype = "solid") +
+    labs(
+      title = paste("Logit vs", label),
+      x = label,
+      y = expression("Logit")
+    ) +
+    theme_minimal(base_size = 16) +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 18),
+      axis.title = element_text(size = 16),
+      axis.text = element_text(size = 14)
+    )
+
+  logit_plot_list[[i]] <- p
+}
+
+combined_plot <- do.call(arrangeGrob, c(logit_plot_list, ncol = 2))
+
+caption_grob <- textGrob(
+  "Figure 5: Linearity check — logit of mortality plotted against continuous variables",
+  gp = gpar(fontface = "bold.italic", fontsize = 16), 
+  hjust = 0.5,
+  vjust = 0.3
+)
 
 final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 
