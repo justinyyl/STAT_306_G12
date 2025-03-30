@@ -5,6 +5,9 @@ library(tidyverse)
 library(broom)
 library(GGally)
 library(patchwork)
+library(gridExtra)
+library(grid)
+library(ggplotify)
 
 # Read the CSV file
 data <- read.csv("data/colorectal_cancer_dataset.csv")
@@ -13,16 +16,26 @@ data <- read.csv("data/colorectal_cancer_dataset.csv")
 usa_data <- data %>%
   filter(Country == "USA")
 
-# Remove Patient_ID, Country, Tumor_Size_mm
+# Remove Patient_ID, Country, Country-level features and other response features
 colorectal_usa <- usa_data %>%
-  select(-Patient_ID, -Country, -Tumor_Size_mm)
+  select(
+    -Patient_ID,                     # Not relevant
+    -Country,                        # Focus on USA only
+    -Incidence_Rate_per_100K,        # Country-level
+    -Mortality_Rate_per_100K,        # Country-level
+    -Economic_Classification,        # Country-level
+    -Healthcare_Access,              # Country-level
+    -Survival_Prediction,            # Same effect as response variable: Mortality
+    -Survival_5_years                # Same effect as response variable: Mortality
+  )
 
-# Sampling 10% observations
-set.seed(42)  # for reproducibility
-colorectal_usa <- colorectal_usa[sample(nrow(colorectal_usa), nrow(colorectal_usa)/10), ]
+# Set response variable 
+resp <- "Mortality"
+# Set response variable into factor type
+colorectal_usa[[resp]] <- as.factor(colorectal_usa[[resp]])
 
-# Set response variable
-resp <- "Mortality_Rate_per_100K"
+# Set the unit of Healthcare_Costs in $1,000
+colorectal_usa[["Healthcare_Costs"]] <- colorectal_usa[["Healthcare_Costs"]]/1000
 
 # Initialize containers
 continuous <- c()
@@ -46,50 +59,135 @@ for (colname in categorical) {
   colorectal_usa[[colname]] <- as.factor(colorectal_usa[[colname]])
 }
 
-# Boxplots for categorical variables
-for (colname in categorical) {
-  cat("Boxplot:", resp, "by", colname, "\n")
-    
-  xvar <- colorectal_usa[[colname]]
-  yvar <- colorectal_usa[[resp]]
-    
-  p <- ggplot(colorectal_usa, aes(x = xvar, y = yvar)) +
-    geom_boxplot(fill = "lightblue") +
-    labs(title = paste("Boxplot of", resp, "by", colname),
-          x = colname, y = resp) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    
-  print(p)
+# Bar plot of Mortality in original dataset
+plot_not_balance <- ggplot(colorectal_usa, aes(x = Mortality, fill = Mortality)) +
+  geom_bar(alpha = 0.6) +
+  scale_fill_manual(values = c("blue", "red"), labels = c("Alive", "Dead")) +
+  labs(
+    title = "Class Distribution of Mortality (Imbalance)",
+    x = "Mortality Status",
+    y = "Count"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    legend.position = "none"
+  )
+
+# Count how many in minority class
+min_class_size <- min(table(colorectal_usa$Mortality))
+
+# Sample from each class equally
+set.seed(123)
+balanced_data <- colorectal_usa %>%
+  group_by(Mortality) %>%
+  sample_n(min_class_size) %>%
+  ungroup()
+
+# Bar plot of Mortality in balanced dataset
+plot_balance <- ggplot(balanced_data, aes(x = Mortality, fill = Mortality)) +
+  geom_bar(alpha = 0.6) +
+  scale_fill_manual(values = c("blue", "red"), labels = c("Alive", "Dead")) +
+  labs(
+    title = "Class Distribution of Mortality (Balance)",
+    x = "Mortality Status",
+    y = "Count"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    legend.position = "none"
+  )
+
+my_list <- list(plot_not_balance, plot_balance)
+
+combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 2))
+
+caption_grob <- textGrob("Figure 1: Class Distribution of the Mortality Variable Before and After Balancing",
+                         gp = gpar(fontface = "bold.italic", fontsize = 15), 
+                         hjust = 0.5,
+                         vjust = 0.3)
+
+final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
+
+as.ggplot(final_plot)
+
+# Create Histogram plots for Continuous Covariates of Binary Response
+numeric_cols <- c("Age", "Tumor Size (mm)", "Healthcare Costs ($K)")
+my_list <- list()
+
+for (i in seq_along(continuous)) {
+  feat <- continuous[i]
+  feat_plot <- ggplot(balanced_data, aes_string(x = feat, fill = resp)) + 
+    geom_histogram(bins = 30, alpha = 0.6, position = "identity") +
+    labs(
+      title = paste("Histogram of", numeric_cols[i]), 
+      x = numeric_cols[i], 
+      y = "Frequency"
+    ) +
+    scale_fill_manual(values = c("blue", "red"), labels = c("Alive", "Dead")) +
+    guides(fill = guide_legend(title = "Mortality")) +
+    theme_minimal(base_size = 16) +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 18),
+      axis.title = element_text(size = 16),
+      axis.text = element_text(size = 14),
+      legend.title = element_text(size = 15),
+      legend.text = element_text(size = 14)
+    )
+  my_list[[i]] <- feat_plot
 }
 
-# Scatter plots for continuous variables
-for (colname in continuous) {
-  cat("Scatter plot:", resp, "vs", colname, "\n")
+combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 2))
+
+caption_grob <- textGrob("Figure 2: Distribution of continuous variables by mortality status",
+                         gp = gpar(fontface = "bold.italic", fontsize = 23), 
+                         hjust = 0.5,
+                         vjust = 0.3)
+
+final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
+
+as.ggplot(final_plot)
+
+# Create Proportion Bar plots for Categorical Covariates of Binary Response
+categorical_cols <- c("Gender", "Cancer Stage", "Family History", "Smoking History", "Alcohol Consumption", "Obesity BMI", "Diet Risk", "Physical Activity", "Diabetes", "Inflammatory Bowel Disease", "Genetic Mutation", " Screening History", "Early Detection", "Treatment Type", "Urban or Rural", "Insurance Status")
+my_list <- list()
+for (i in seq_along(categorical)) {
+  feat <- categorical[i]
+  feat_plot <- ggplot(balanced_data, aes_string(x = feat, fill = resp)) +
+    geom_bar(position = "fill", , alpha = 0.6) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    labs(
+      title = paste("Mortality Proportion by", categorical_cols[i]),
+      x = categorical_cols[i],
+      y = "Proportion"
+    ) +
+    scale_fill_manual(values = c("blue", "red"), labels = c("Alive", "Dead")) +
+    guides(fill = guide_legend(title = "Mortality")) +
+    theme_minimal(base_size = 32) +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 36),
+      axis.title = element_text(size = 32),
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 28),
+      axis.text.y = element_text(size = 28),
+      legend.title = element_text(size = 30),
+      legend.text = element_text(size = 28)
+    )
   
-  xvar <- colorectal_usa[[colname]]
-  yvar <- colorectal_usa[[resp]]
-  
-  p <- ggplot(colorectal_usa, aes(x = xvar, y = yvar)) +
-    geom_point(alpha = 0.6, color = "tomato") +
-    geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed") +
-    labs(title = paste("Scatter Plot of", resp, "vs", colname),
-         x = colname, y = resp)
-  
-  print(p)
+  my_list[[i]] <- feat_plot
 }
 
-# Select only numeric variables
-numeric_data <- colorectal_usa[sapply(colorectal_usa, is.numeric)]
+combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 4))
 
-# Drop rows with missing in response
-resp <- "Mortality_Rate_per_100K"
-numeric_data <- numeric_data[!is.na(numeric_data[[resp]]), ]
+caption_grob <- textGrob("Figure 3: Proportion Bar plots for Categorical variables by mortality status",
+                         gp = gpar(fontface = "bold.italic", fontsize = 62), 
+                         hjust = 0.5,
+                         vjust = 0.3)
 
-subset_data <- colorectal_usa[, names(numeric_data)]
+final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 
-# Plot
-ggpairs(subset_data,
-        title = "Pairwise Plot of Selected Variables",
-        upper = list(continuous = wrap("cor", size = 3)),
-        lower = list(continuous = wrap("points", alpha = 0.3)),
-        diag = list(continuous = wrap("barDiag", fill = "steelblue")))
+as.ggplot(final_plot)
