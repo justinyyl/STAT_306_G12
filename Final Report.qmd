@@ -329,8 +329,7 @@ full_model <- glm(Mortality ~ ., data = balanced_data, family = binomial)
       geom_vline(xintercept = 0.5, linetype = "dashed", color = "red") +
       labs(
         x = expression("Predicted Probability (" * hat(pi) * ")"),
-        y = expression("Binomial Variance " * hat(pi) * " (1 - " * hat(pi) * ")"),
-        title = "Variance Structure in Logistic Regression"
+        y = expression("Binomial Variance " * hat(pi) * " (1 - " * hat(pi) * ")")
       ) +
      scale_x_continuous(
       breaks = seq(0.45, 0.55, by = 0.01), limits = c(0.44, 0.56)) +
@@ -400,7 +399,86 @@ full_model <- glm(Mortality ~ ., data = balanced_data, family = binomial)
 #### Feature Selection
 
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 
+
+# Start with full model
+selected_vars <- setdiff(names(balanced_data), resp)
+current_formula <- as.formula(paste(resp, "~", paste(selected_vars, collapse = " + ")))
+current_model <- glm(current_formula, data = balanced_data, family = binomial)
+current_aic <- AIC(current_model)
+
+# Store best models
+best_models <- data.frame(
+  Num_Covariates = length(selected_vars),
+  AIC = current_aic,
+  Variables = paste(selected_vars, collapse = " + "),
+  stringsAsFactors = FALSE
+)
+
+step <- 1
+improvement <- TRUE
+
+while (improvement && length(selected_vars) > 1) {
+  aic_list <- c()
+
+  # Try removing each variable one at a time
+  for (var in selected_vars) {
+    test_vars <- setdiff(selected_vars, var)
+    test_formula <- as.formula(paste(resp, "~", paste(test_vars, collapse = " + ")))
+    test_model <- glm(test_formula, data = balanced_data, family = binomial)
+    aic_list[var] <- AIC(test_model)
+  }
+
+  best_var_to_remove <- names(which.min(aic_list))
+  best_aic <- min(aic_list)
+
+  if (best_aic < current_aic) {
+    selected_vars <- setdiff(selected_vars, best_var_to_remove)
+    current_aic <- best_aic
+    current_formula <- as.formula(paste(resp, "~", paste(selected_vars, collapse = " + ")))
+    current_model <- glm(current_formula, data = balanced_data, family = binomial)
+
+    # Log best model at this level
+    best_models <- rbind(best_models, data.frame(
+      Num_Covariates = length(selected_vars),
+      AIC = best_aic,
+      Variables = paste(selected_vars, collapse = " + ")
+    ))
+    step <- step + 1
+  } else {
+    improvement <- FALSE
+  }
+}
+
+# Add null model into best_models
+best_models <- rbind(best_models, data.frame(
+      Num_Covariates = 0,
+      AIC = AIC(glm(Mortality ~ 1, data = balanced_data, family = binomial)),
+      Variables = 1
+    ))
+
+aic_plot <- ggplot(best_models, aes(x = Num_Covariates, y = AIC)) +
+  geom_line(color = "black") +
+  geom_point(color = "red") +
+  labs(
+    x = "Number of Covariates",
+    y = "AIC"
+  ) +
+  theme_minimal()
+
+# Caption as a grob (bold + italic)
+caption_grob <- textGrob("Figure 6: AIC vs Number of Covariates – demonstrating backward feature selection.",
+                         gp = gpar(fontface = "bold.italic", fontsize = 8),
+                         hjust = 0.5, vjust = 0.3)
+
+# Combine plot and caption
+final_plot <- arrangeGrob(aic_plot, bottom = caption_grob)
+
+# Convert to ggplot object
+as.ggplot(final_plot)
 ```
 
 ### Statistical Analysis
