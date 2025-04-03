@@ -13,14 +13,14 @@ library(ggplotify)
 data <- read.csv("data/colorectal_cancer_dataset.csv")
 
 # Select the data in USA
-usa_data <- data %>%
-  filter(Country == "USA")
+ca_data <- data %>%
+  filter(Country == "Canada")
 
 # Remove Patient_ID, Country, Country-level features and other response features
-colorectal_usa <- usa_data %>%
+colorectal_CA <- ca_data %>%
   select(
     -Patient_ID,                     # Not relevant
-    -Country,                        # Focus on USA only
+    -Country,                        # Focus on Canada only
     -Incidence_Rate_per_100K,        # Country-level
     -Mortality_Rate_per_100K,        # Country-level
     -Economic_Classification,        # Country-level
@@ -32,20 +32,20 @@ colorectal_usa <- usa_data %>%
 # Set response variable 
 resp <- "Mortality"
 # Set response variable into factor type
-colorectal_usa[[resp]] <- as.factor(colorectal_usa[[resp]])
+colorectal_CA[[resp]] <- as.factor(colorectal_CA[[resp]])
 
 # Set the unit of Healthcare_Costs in $1,000
-colorectal_usa[["Healthcare_Costs"]] <- colorectal_usa[["Healthcare_Costs"]]/1000
+colorectal_CA[["Healthcare_Costs"]] <- colorectal_CA[["Healthcare_Costs"]]/1000
 
 # Initialize containers
 continuous <- c()
 categorical <- c()
 
 # Loop through all variables
-for (colname in names(colorectal_usa)) {
+for (colname in names(colorectal_CA)) {
   if (colname == resp) next  # Skip the response variable itself
   
-  column <- colorectal_usa[[colname]]
+  column <- colorectal_CA[[colname]]
   
   if (is.numeric(column)) {
     continuous <- c(continuous, colname)
@@ -56,11 +56,11 @@ for (colname in names(colorectal_usa)) {
 
 # Convert all categorical variables to factors
 for (colname in categorical) {
-  colorectal_usa[[colname]] <- as.factor(colorectal_usa[[colname]])
+  colorectal_CA[[colname]] <- as.factor(colorectal_CA[[colname]])
 }
 
 # Bar plot of Mortality in original dataset
-plot_not_balance <- ggplot(colorectal_usa, aes(x = Mortality, fill = Mortality)) +
+plot_not_balance <- ggplot(colorectal_CA, aes(x = Mortality, fill = Mortality)) +
   geom_bar(alpha = 0.6) +
   scale_fill_manual(values = c("blue", "red"), labels = c("Alive", "Dead")) +
   labs(
@@ -77,11 +77,11 @@ plot_not_balance <- ggplot(colorectal_usa, aes(x = Mortality, fill = Mortality))
   )
 
 # Count how many in minority class
-min_class_size <- min(table(colorectal_usa$Mortality))
+min_class_size <- min(table(colorectal_CA$Mortality))
 
 # Sample from each class equally
 set.seed(123)
-balanced_data <- colorectal_usa %>%
+balanced_data <- colorectal_CA %>%
   group_by(Mortality) %>%
   sample_n(min_class_size) %>%
   ungroup()
@@ -125,7 +125,7 @@ for (i in seq_along(continuous)) {
   feat_plot <- ggplot(balanced_data, aes_string(x = feat, fill = resp)) + 
     geom_histogram(bins = 30, alpha = 0.6, position = "identity") +
     labs(
-      title = paste("Histogram of", numeric_cols[i]), 
+      #title = paste("Histogram of", numeric_cols[i]), 
       x = numeric_cols[i], 
       y = "Frequency"
     ) +
@@ -133,7 +133,7 @@ for (i in seq_along(continuous)) {
     guides(fill = guide_legend(title = "Mortality")) +
     theme_minimal(base_size = 16) +
     theme(
-      plot.title = element_text(hjust = 0.5, size = 18),
+      #plot.title = element_text(hjust = 0.5, size = 18),
       axis.title = element_text(size = 16),
       axis.text = element_text(size = 14),
       legend.title = element_text(size = 15),
@@ -162,7 +162,7 @@ for (i in seq_along(categorical)) {
     geom_bar(position = "fill", , alpha = 0.6) +
     scale_y_continuous(labels = scales::percent_format()) +
     labs(
-      title = paste("Mortality Proportion by", categorical_cols[i]),
+      #title = paste("Mortality Proportion by", categorical_cols[i]),
       x = categorical_cols[i],
       y = "Proportion"
     ) +
@@ -239,13 +239,13 @@ for (i in seq_along(continuous)) {
     geom_point(alpha = 0.4, color = "darkblue") +
     geom_smooth(method = "loess", color = "red", se = FALSE, linetype = "solid") +
     labs(
-      title = paste("Logit vs", label),
+      #title = paste("Logit vs", label),
       x = label,
       y = expression("Logit")
     ) +
     theme_minimal(base_size = 16) +
     theme(
-      plot.title = element_text(hjust = 0.5, size = 18),
+      #plot.title = element_text(hjust = 0.5, size = 18),
       axis.title = element_text(size = 16),
       axis.text = element_text(size = 14)
     )
@@ -265,7 +265,6 @@ caption_grob <- textGrob(
 final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 
 as.ggplot(final_plot)
-
 
 # Start with full model
 selected_vars <- setdiff(names(balanced_data), resp)
@@ -316,13 +315,6 @@ while (improvement && length(selected_vars) > 1) {
   }
 }
 
-# Add null model into best_models
-best_models <- rbind(best_models, data.frame(
-      Num_Covariates = 0,
-      AIC = AIC(glm(Mortality ~ 1, data = balanced_data, family = binomial)),
-      Variables = 1
-    ))
-
 aic_plot <- ggplot(best_models, aes(x = Num_Covariates, y = AIC)) +
   geom_line(color = "black") +
   geom_point(color = "red") +
@@ -330,7 +322,8 @@ aic_plot <- ggplot(best_models, aes(x = Num_Covariates, y = AIC)) +
     x = "Number of Covariates",
     y = "AIC"
   ) +
-  theme_minimal()
+  theme_minimal() + 
+  scale_x_continuous(breaks = best_models$Num_Covariates)
 
 # Caption as a grob (bold + italic)
 caption_grob <- textGrob("Figure 6: AIC vs Number of Covariates – demonstrating backward feature selection.",
@@ -342,3 +335,12 @@ final_plot <- arrangeGrob(aic_plot, bottom = caption_grob)
 
 # Convert to ggplot object
 as.ggplot(final_plot)
+
+# Fit full model
+full_model <- glm(Mortality ~., data = balanced_data, family = binomial)
+
+# Perform backward selection
+backward_model <- step(full_model, direction = "backward", trace = 1)
+
+# View summary of final model
+summary(backward_model)
