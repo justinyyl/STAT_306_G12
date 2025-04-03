@@ -314,8 +314,8 @@ full_model <- glm(Mortality ~ ., data = balanced_data, family = binomial)
     #| echo: false
     #| message: false
     #| warning: false
-    #| fig-width: 15
-    #| fig-height: 9
+    #| fig-width: 7
+    #| fig-height: 7
 
     # Compute predicted probabilities
     fitted_probs <- fitted(full_model)
@@ -336,7 +336,7 @@ full_model <- glm(Mortality ~ ., data = balanced_data, family = binomial)
       theme_minimal(base_size = 16)
 
     caption_grob <- textGrob("Figure 4: Variance peaks at predicted probability = 0.5.",
-                             gp = gpar(fontface = "bold.italic", fontsize = 24), 
+                             gp = gpar(fontface = "bold.italic", fontsize = 10), 
                              hjust = 0.5, vjust = 0.3)
 
     final_plot <- arrangeGrob(variance_plot, bottom = caption_grob)
@@ -415,12 +415,11 @@ best_models <- data.frame(
   AIC = current_aic,
   Variables = paste(selected_vars, collapse = " + "),
   stringsAsFactors = FALSE
-)
+  )
 
-step <- 1
-improvement <- TRUE
+step <- 19
 
-while (improvement && length(selected_vars) > 1) {
+while (step > 1) {
   aic_list <- c()
 
   # Try removing each variable one at a time
@@ -434,23 +433,26 @@ while (improvement && length(selected_vars) > 1) {
   best_var_to_remove <- names(which.min(aic_list))
   best_aic <- min(aic_list)
 
-  if (best_aic < current_aic) {
-    selected_vars <- setdiff(selected_vars, best_var_to_remove)
-    current_aic <- best_aic
-    current_formula <- as.formula(paste(resp, "~", paste(selected_vars, collapse = " + ")))
-    current_model <- glm(current_formula, data = balanced_data, family = binomial)
+  selected_vars <- setdiff(selected_vars, best_var_to_remove)
+  current_aic <- best_aic
+  current_formula <- as.formula(paste(resp, "~", paste(selected_vars, collapse = " + ")))
+  current_model <- glm(current_formula, data = balanced_data, family = binomial)
 
-    # Log best model at this level
-    best_models <- rbind(best_models, data.frame(
-      Num_Covariates = length(selected_vars),
-      AIC = best_aic,
-      Variables = paste(selected_vars, collapse = " + ")
+  # Log best model at this level
+  best_models <- rbind(best_models, data.frame(
+    Num_Covariates = length(selected_vars),
+    AIC = best_aic,
+    Variables = paste(selected_vars, collapse = " , ")
     ))
-    step <- step + 1
-  } else {
-    improvement <- FALSE
-  }
+  step <- step - 1
 }
+
+# Add the null model
+best_models <- rbind(best_models, data.frame(
+  Num_Covariates = 0,
+  AIC = AIC(glm(Mortality ~ 1, data = balanced_data, family = binomial)),
+  Variables = paste(selected_vars, collapse = " , ")
+  ))
 
 aic_plot <- ggplot(best_models, aes(x = Num_Covariates, y = AIC)) +
   geom_line(color = "black") +
@@ -483,7 +485,7 @@ as.ggplot(final_plot)
 full_model <- glm(Mortality ~., data = balanced_data, family = binomial)
 
 # Perform backward selection
-backward_model <- step(full_model, direction = "backward", trace = 1)
+backward_model <- step(full_model, direction = "backward", trace = 0)
 
 # View summary of final model
 summary(backward_model)
@@ -492,7 +494,16 @@ summary(backward_model)
 ### Statistical Analysis
 
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 
+# Add losing covarite of interest back to backward selected model
+reduced_model <- glm(
+  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs + Early_Detection,
+  family = binomial, data = balanced_data
+  )
+summary(reduced_model)
 ```
 
 ### Results Interpretation
