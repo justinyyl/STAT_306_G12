@@ -53,13 +53,37 @@ Clearly define the research questions or objectives.
 
 ### Dataset Overview
 
-Describe:
+The dataset we decide to conduct our analysis of Mortality status (Alive/Dead) was sourced from Kaggle, which the dataset name is “Colorectal Cancer Global Dataset & Predictions”. For the objective of this project, we only considered the data from Canada, which includes patient demographics, lifestyle risks, medical history, cancer stage, treatment types, survival chances, and healthcare costs. Key variables of we are going to investigate as follows:
 
--   Where the data comes from
+#### **Response variable:**
 
--   What each variable represents
+| Name | Description | Type |
+|----|----|----|
+| Mortality status | Status of patients' mortality (Yes/No) | Categorical, nominal |
 
--   How the data was collected (if known)
+#### Explanatory variable:
+
+| Name | Description | Type |
+|------------------------|------------------------|------------------------|
+| Alcohol Consumption | status of Patient's alcohol consumption (Yes/No) | Categorical, nominal |
+| Age | Patient's age in years | Numerical, continuous |
+| Cancer Stage | diagnosis of stage in cancer (Localized, Regional, Metastatic) | Categorical, ordinal |
+| Diabetes | status of Patient's diabetes (Yes/No) | Categorical, nominal |
+| Diet Risk | Level of risk based on dietary (Low, Moderate, High) | Categorical, ordinal |
+| Early Detection | detection of colorectal cancer at an early stage (Yes/No) | Categorical, nominal |
+| Family History | Presence of family history of colorectal cancer (Yes/No) | Categorical, nominal |
+| Genetic Mutation | Presence of genetic mutations of colorectal cancer (Yes/No) | Categorical, nominal |
+| Gender | Gender of the patient (Male/Female) | Categorical, nominal |
+| Healthcare cost | Estimated healthcare expenditure per patient (1,000 units in \$) | Numerical, continuous |
+| Inflammatory Bowel Disease | Status of inflammatory bowel disease (Yes/No) | Categorical, nominal |
+| Insurance Status | Health insurance coverage status (Insured, Uninsured) | Categorical, nominal |
+| Obesity BMI | Classification based on Body Mass Index (Normal, Overweight, Obese) | Categorical, ordinal |
+| Physical Activity | Physical activity level (Low, Moderate, High) | Categorical, ordinal |
+| Screening History | History of cancer screening  in 3 levels (Regular, Irregular, Never) | Categorical, ordinal |
+| Smoking History | Patient's smoking history (Yes/No) | Categorical, nominal |
+| Treatment Type | Type of treatment that patients received (Surgery, Chemotherapy, Radiotherapy, Combination) | Categorical, ordinal |
+| Tumor size | colorectal tumor measured in millimeters (mm) | Numerical, continuous |
+| Urban or Rural | The type of patients area (Urban/ Rural) | Categorical, nominal |
 
 ### Motivation
 
