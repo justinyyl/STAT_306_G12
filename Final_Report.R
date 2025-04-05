@@ -3,10 +3,8 @@ library(car)
 library(leaps)
 library(tidyverse)
 library(broom)
-library(GGally)
-library(patchwork)
-library(gridExtra)
 library(grid)
+library(gridExtra)
 library(ggplotify)
 
 # Read the CSV file
@@ -235,7 +233,7 @@ for (i in seq_along(continuous)) {
   feat <- continuous[i]
   label <- numeric_cols[i]
 
-  p <- ggplot(balanced_data, aes_string(x = feat, y = logit_vals)) +
+  linearity_plot <- ggplot(balanced_data, aes_string(x = feat, y = logit_vals)) +
     geom_point(alpha = 0.4, color = "darkblue") +
     geom_smooth(method = "loess", color = "red", se = FALSE, linetype = "solid") +
     labs(
@@ -250,7 +248,7 @@ for (i in seq_along(continuous)) {
       axis.text = element_text(size = 14)
     )
 
-  logit_plot_list[[i]] <- p
+  logit_plot_list[[i]] <- linearity_plot
 }
 
 combined_plot <- do.call(arrangeGrob, c(logit_plot_list, ncol = 3))
