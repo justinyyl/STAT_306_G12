@@ -142,10 +142,10 @@ for (i in seq_along(continuous)) {
   my_list[[i]] <- feat_plot
 }
 
-combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 2))
+combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 3))
 
 caption_grob <- textGrob("Figure 2: Distribution of continuous variables by mortality status",
-                         gp = gpar(fontface = "bold.italic", fontsize = 24), 
+                         gp = gpar(fontface = "bold.italic", fontsize = 23), 
                          hjust = 0.5,
                          vjust = 0.3)
 
@@ -214,10 +214,10 @@ variance_plot <- ggplot(data.frame(fitted_probs, binomial_var), aes(x = fitted_p
   ) +
  scale_x_continuous(
   breaks = seq(0.45, 0.55, by = 0.01), limits = c(0.44, 0.56)) +
-  theme_minimal(base_size = 16)
+  theme_minimal(base_size = 13)
 
 caption_grob <- textGrob("Figure 4: Variance peaks at predicted probability = 0.5.",
-                         gp = gpar(fontface = "bold.italic", fontsize = 10), 
+                         gp = gpar(fontface = "bold.italic", fontsize = 11), 
                          hjust = 0.5, vjust = 0.3)
 
 final_plot <- arrangeGrob(variance_plot, bottom = caption_grob)
@@ -253,11 +253,11 @@ for (i in seq_along(continuous)) {
   logit_plot_list[[i]] <- p
 }
 
-combined_plot <- do.call(arrangeGrob, c(logit_plot_list, ncol = 2))
+combined_plot <- do.call(arrangeGrob, c(logit_plot_list, ncol = 3))
 
 caption_grob <- textGrob(
   "Figure 5: Linearity check — logit of mortality plotted against continuous variables",
-  gp = gpar(fontface = "bold.italic", fontsize = 16), 
+  gp = gpar(fontface = "bold.italic", fontsize = 17), 
   hjust = 0.5,
   vjust = 0.3
 )
@@ -329,7 +329,7 @@ aic_plot <- ggplot(best_models, aes(x = Num_Covariates, y = AIC)) +
 
 # Caption as a grob (bold + italic)
 caption_grob <- textGrob("Figure 6: AIC vs Number of Covariates – demonstrating backward feature selection.",
-                         gp = gpar(fontface = "bold.italic", fontsize = 8),
+                         gp = gpar(fontface = "bold.italic", fontsize = 9),
                          hjust = 0.5, vjust = 0.3)
 
 # Combine plot and caption
@@ -344,12 +344,24 @@ full_model <- glm(Mortality ~., data = balanced_data, family = binomial)
 # Perform backward selection
 backward_model <- step(full_model, direction = "backward", trace = 0)
 
-# View summary of final model
-summary(backward_model)
+# View summary of selected model
+summay_backward <- summary(backward_model)
+summary_full <- summary(full_model)
 
 # Add losing covarite of interest back to backward selected model
-reduced_model <- glm(
+reduced_additive_model <- glm(
   formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs + Early_Detection,
   family = binomial, data = balanced_data
   )
-summary(reduced_model)
+
+# fit interaction term with two covariates of interest
+reduced_interaction_model <- glm(
+  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs * Early_Detection,
+  family = binomial, data = balanced_data
+  )
+
+# Use ANOVA for goodness-of-fit test
+lrt_result <- anova(reduced_additive_model, reduced_interaction_model, test = "LRT")
+
+# Summary result for additive model
+result_additive <- summary(reduced_additive_model)
