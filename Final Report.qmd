@@ -1,9 +1,23 @@
 ---
-title: "Associations of Healthcare Costs and Early Detection with Colorectal Cancer Mortality in the USA"
-author: "Yulin Yuan, Ruohan Sun, Tony Lee"
+title: ""
+author: ""
 format: pdf
 editor: visual
 ---
+
+```{=latex}
+\begin{titlepage}
+    \centering
+    \vspace*{0.3\textheight}
+    {\Huge\bfseries Associations of Healthcare Costs and Early Detection\\[0.5em]
+    with Colorectal Cancer Mortality in Canada \par}
+    \vspace{2cm}
+    {\Large Yulin Yuan, Ruohan Sun, Tony Lee\par}
+    \vspace{1cm}
+    {\large April 4, 2025\par}
+    \vfill
+\end{titlepage}
+```
 
 ```{r}
 #| echo: false
@@ -45,6 +59,8 @@ colorectal_CA <- ca_data %>%
   )
 ```
 
+\newpage
+
 ## Introduction
 
 ### Study Objective
@@ -55,35 +71,61 @@ Clearly define the research questions or objectives.
 
 The dataset we decide to conduct our analysis of Mortality status (Alive/Dead) was sourced from Kaggle, which the dataset name is “Colorectal Cancer Global Dataset & Predictions”. For the objective of this project, we only considered the data from Canada, which includes patient demographics, lifestyle risks, medical history, cancer stage, treatment types, survival chances, and healthcare costs. Key variables of we are going to investigate as follows:
 
-#### **Response variable:**
+#### Response Variable
 
-| Name | Description | Type |
-|----|----|----|
-| Mortality status | Status of patients' mortality (Yes/No) | Categorical, nominal |
+\begin{longtable}{|p{4cm}|p{9cm}|p{4cm}|}
+\hline
+\textbf{Variable} & \textbf{Description} & \textbf{Type} \\
+\hline
+Mortality Status & Status of patients' mortality (Yes/No) & Categorical, nominal \\
+\hline
+\end{longtable}
 
-#### Explanatory variable:
+#### Explanatory Variables
 
-| Name | Description | Type |
-|------------------------|------------------------|------------------------|
-| Alcohol Consumption | status of Patient's alcohol consumption (Yes/No) | Categorical, nominal |
-| Age | Patient's age in years | Numerical, continuous |
-| Cancer Stage | diagnosis of stage in cancer (Localized, Regional, Metastatic) | Categorical, ordinal |
-| Diabetes | status of Patient's diabetes (Yes/No) | Categorical, nominal |
-| Diet Risk | Level of risk based on dietary (Low, Moderate, High) | Categorical, ordinal |
-| Early Detection | detection of colorectal cancer at an early stage (Yes/No) | Categorical, nominal |
-| Family History | Presence of family history of colorectal cancer (Yes/No) | Categorical, nominal |
-| Genetic Mutation | Presence of genetic mutations of colorectal cancer (Yes/No) | Categorical, nominal |
-| Gender | Gender of the patient (Male/Female) | Categorical, nominal |
-| Healthcare cost | Estimated healthcare expenditure per patient (1,000 units in \$) | Numerical, continuous |
-| Inflammatory Bowel Disease | Status of inflammatory bowel disease (Yes/No) | Categorical, nominal |
-| Insurance Status | Health insurance coverage status (Insured, Uninsured) | Categorical, nominal |
-| Obesity BMI | Classification based on Body Mass Index (Normal, Overweight, Obese) | Categorical, ordinal |
-| Physical Activity | Physical activity level (Low, Moderate, High) | Categorical, ordinal |
-| Screening History | History of cancer screening  in 3 levels (Regular, Irregular, Never) | Categorical, ordinal |
-| Smoking History | Patient's smoking history (Yes/No) | Categorical, nominal |
-| Treatment Type | Type of treatment that patients received (Surgery, Chemotherapy, Radiotherapy, Combination) | Categorical, ordinal |
-| Tumor size | colorectal tumor measured in millimeters (mm) | Numerical, continuous |
-| Urban or Rural | The type of patients area (Urban/ Rural) | Categorical, nominal |
+\begin{longtable}{|p{4cm}|p{9cm}|p{4cm}|}
+\hline
+\textbf{Variable} & \textbf{Description} & \textbf{Type} \\
+\hline
+Alcohol Consumption & Status of patient's alcohol consumption (Yes/No) & Categorical, nominal \\
+\hline
+Age & Patient's age in years & Numerical, continuous \\
+\hline
+Cancer Stage & Diagnosis stage of cancer (Localized, Regional, Metastatic) & Categorical, ordinal \\
+\hline
+Diabetes & Status of patient's diabetes (Yes/No) & Categorical, nominal \\
+\hline
+Diet Risk & Level of dietary risk (Low, Moderate, High) & Categorical, ordinal \\
+\hline
+Early Detection & Detection of colorectal cancer at an early stage (Yes/No) & Categorical, nominal \\
+\hline
+Family History & Presence of family history of colorectal cancer (Yes/No) & Categorical, nominal \\
+\hline
+Genetic Mutation & Presence of genetic mutations for colorectal cancer (Yes/No) & Categorical, nominal \\
+\hline
+Gender & Gender of the patient (Male/Female) & Categorical, nominal \\
+\hline
+Healthcare Cost & Estimated healthcare expenditure per patient (1,000 units in \$) & Numerical, continuous \\
+\hline
+Inflammatory Bowel Disease & Status of inflammatory bowel disease (Yes/No) & Categorical, nominal \\
+\hline
+Insurance Status & Health insurance coverage (Insured/Uninsured) & Categorical, nominal \\
+\hline
+Obesity BMI & BMI classification (Normal, Overweight, Obese) & Categorical, ordinal \\
+\hline
+Physical Activity & Level of physical activity (Low, Moderate, High) & Categorical, ordinal \\
+\hline
+Screening History & Cancer screening history (Regular, Irregular, Never) & Categorical, ordinal \\
+\hline
+Smoking History & Patient's smoking history (Yes/No) & Categorical, nominal \\
+\hline
+Treatment Type & Type of treatment received (Surgery, Chemotherapy, Radiotherapy, Combination) & Categorical, ordinal \\
+\hline
+Tumor Size & Colorectal tumor size in millimeters (mm) & Numerical, continuous \\
+\hline
+Urban or Rural & Patient's area of residence (Urban/Rural) & Categorical, nominal \\
+\hline
+\end{longtable}
 
 ### Motivation
 
@@ -205,7 +247,7 @@ as.ggplot(final_plot)
 #| message: false
 #| warning: false
 #| fig-width: 15
-#| fig-height: 10
+#| fig-height: 5
 
 # Create Histogram plots for Continuous Covariates of Binary Response
 numeric_cols <- c("Age", "Tumor Size (mm)", "Healthcare Costs ($K)")
@@ -233,10 +275,10 @@ for (i in seq_along(continuous)) {
   my_list[[i]] <- feat_plot
 }
 
-combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 2))
+combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 3))
 
 caption_grob <- textGrob("Figure 2: Distribution of continuous variables by mortality status",
-                         gp = gpar(fontface = "bold.italic", fontsize = 24), 
+                         gp = gpar(fontface = "bold.italic", fontsize = 23), 
                          hjust = 0.5,
                          vjust = 0.3)
 
@@ -339,7 +381,7 @@ full_model <- glm(Mortality ~ ., data = balanced_data, family = binomial)
     #| message: false
     #| warning: false
     #| fig-width: 7
-    #| fig-height: 7
+    #| fig-height: 3
 
     # Compute predicted probabilities
     fitted_probs <- fitted(full_model)
@@ -357,10 +399,10 @@ full_model <- glm(Mortality ~ ., data = balanced_data, family = binomial)
       ) +
      scale_x_continuous(
       breaks = seq(0.45, 0.55, by = 0.01), limits = c(0.44, 0.56)) +
-      theme_minimal(base_size = 16)
+      theme_minimal(base_size = 13)
 
     caption_grob <- textGrob("Figure 4: Variance peaks at predicted probability = 0.5.",
-                             gp = gpar(fontface = "bold.italic", fontsize = 10), 
+                             gp = gpar(fontface = "bold.italic", fontsize = 11), 
                              hjust = 0.5, vjust = 0.3)
 
     final_plot <- arrangeGrob(variance_plot, bottom = caption_grob)
@@ -374,7 +416,7 @@ full_model <- glm(Mortality ~ ., data = balanced_data, family = binomial)
     #| echo: false
     #| message: false
     #| warning: false
-    #| fig-height: 15
+    #| fig-height: 5
     #| fig-width: 10
 
     # Get the logit (link) values
@@ -406,11 +448,11 @@ full_model <- glm(Mortality ~ ., data = balanced_data, family = binomial)
       logit_plot_list[[i]] <- p
     }
 
-    combined_plot <- do.call(arrangeGrob, c(logit_plot_list, ncol = 2))
+    combined_plot <- do.call(arrangeGrob, c(logit_plot_list, ncol = 3))
 
     caption_grob <- textGrob(
       "Figure 5: Linearity check — logit of mortality plotted against continuous variables",
-      gp = gpar(fontface = "bold.italic", fontsize = 16), 
+      gp = gpar(fontface = "bold.italic", fontsize = 17), 
       hjust = 0.5,
       vjust = 0.3
     )
@@ -490,7 +532,7 @@ aic_plot <- ggplot(best_models, aes(x = Num_Covariates, y = AIC)) +
 
 # Caption as a grob (bold + italic)
 caption_grob <- textGrob("Figure 6: AIC vs Number of Covariates – demonstrating backward feature selection.",
-                         gp = gpar(fontface = "bold.italic", fontsize = 8),
+                         gp = gpar(fontface = "bold.italic", fontsize = 9),
                          hjust = 0.5, vjust = 0.3)
 
 # Combine plot and caption
@@ -511,9 +553,28 @@ full_model <- glm(Mortality ~., data = balanced_data, family = binomial)
 # Perform backward selection
 backward_model <- step(full_model, direction = "backward", trace = 0)
 
-# View summary of final model
-summary(backward_model)
+# View summary of selected model
+summay_backward <- summary(backward_model)
+summary_full <- summary(full_model)
 ```
+
+```{=latex}
+\begin{table}[ht]
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{Model} & \textbf{Residual Deviance} & \textbf{AIC} \\
+\hline
+Full Model              & 9710.7 (df = 6997) & 9764.7 \\
+Backward-Selected Model & 9725.6 (df = 7019) & 9735.6 \\
+\hline
+\end{tabular}
+\caption{Residual Deviance and AIC between the backward-selected and full models}
+\label{tab:model_comparison}
+\end{table}
+```
+
+...
 
 ### Statistical Analysis
 
@@ -523,12 +584,64 @@ summary(backward_model)
 #| warning: false
 
 # Add losing covarite of interest back to backward selected model
-reduced_model <- glm(
+reduced_additive_model <- glm(
   formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs + Early_Detection,
   family = binomial, data = balanced_data
   )
-summary(reduced_model)
+
+# fit interaction term with two covariates of interest
+reduced_interaction_model <- glm(
+  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs * Early_Detection,
+  family = binomial, data = balanced_data
+  )
+
+# Use ANOVA for goodness-of-fit test
+lrt_result <- anova(reduced_additive_model, reduced_interaction_model, test = "LRT")
+
+# Summary result for additive model
+result_additive <- summary(reduced_additive_model)
 ```
+
+```{=latex}
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Test Statistic} & \textbf{Degrees of Freedom} & \textbf{p-value} \\
+\hline
+$\chi^2 = 0.549$ & 1 & 0.4586 \\
+\hline
+\end{tabular}
+\caption{Wilks' likelihood ratio test comparison for Additive and Interaction}
+\label{tab:wilks-lrt}
+\end{table}
+```
+
+The result suggests the interaction term does not significantly improve model fit.
+
+...
+
+```{=latex}
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrrl}
+\hline
+\textbf{Predictor} & \textbf{Estimate} & \textbf{Std. Error} & \textbf{z value} & \textbf{Pr($>|z|$)} & \textbf{Significance} \\
+\hline
+(Intercept)              & 0.2256713  & 0.0804475  & 2.805  & 0.00503  & ** \\
+Cancer\_StageMetastatic & -0.0707315 & 0.0648033  & -1.091 & 0.27506  &    \\
+Cancer\_StageRegional   & -0.1151017 & 0.0537461  & -2.142 & 0.03223  & *  \\
+Family\_HistoryYes      & -0.0817314 & 0.0520083  & -1.572 & 0.11607  &    \\
+Healthcare\_Costs       & -0.0018622 & 0.0008735  & -2.132 & 0.03301  & *  \\
+Early\_DetectionYes     & -0.0081611 & 0.0487565  & -0.167 & 0.86707  &    \\
+\hline
+\end{tabular}
+\caption{Regression output with significance levels: * p < 0.05, ** p < 0.01}
+\label{tab:regression_output}
+\end{table}
+```
+
+...
 
 ### Results Interpretation
 
