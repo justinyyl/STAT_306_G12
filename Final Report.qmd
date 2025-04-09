@@ -63,7 +63,7 @@ colorectal_CA <- ca_data %>%
 
 ### Study Objective
 
-Clearly define the research questions or objectives.
+The objective of this study is to evaluate how healthcare expenditures and early detection of colorectal cancer are associated with patient mortality outcomes in Canada. Our goal is to explore whether patients whose cancer is detected at an early stage, and those who bear different levels of healthcare costs, exhibit significantly different mortality rates. Through statistical analysis of available data, we will quantify the strength of these associations and assess their significance. We can build on the findings of this study to inform healthcare decisions, such as emphasizing effective screening programs and optimizing the use of healthcare resources to improve patient outcomes.
 
 ### Dataset Overview
 
@@ -127,9 +127,7 @@ Urban or Rural & Patient's area of residence (Urban/Rural) & Categorical, nomina
 
 ### Motivation
 
--   Why is this question or data important/interesting?
-
--   Need to explain why we remove country-level variable and Patient_ID, reasonable is fine.
+Colorectal cancer is one of the most common cancers in Canada, and it is predicted that rectal cancer will be the fourth most common cancer in Canada by 2024, making it critical to understand the factors that influence mortality (Du Cancer, 2024). Analyzing mortality in relation to healthcare costs and early detection is crucial because it addresses issues at the intersection of patient care and healthcare policy. It is widely recognized that the earlier a cancer is detected, the higher the chance of survival, so examining the impact of early detection of rectal cancer on mortality with actual patient data can help quantify the benefits of screening and early diagnosis efforts in Canada. Similarly, health care expenditures per patient can broadly reflect the intensity or quality of treatment received. Examining the relationship between healthcare expenditure and survival can help determine whether resources could be used more efficiently. By focusing on Canadian patients, we eliminate cross-national differences in healthcare systems, thereby providing a clearer understanding of the role of these factors within the context of a single-country healthcare system.
 
 ## Analysis
 
@@ -649,17 +647,21 @@ inference results
 
 ### Main Findings
 
-Interpreting result in real-world context, careful about causality
+This analysis identified colorectal cancer stage at diagnosis and patient health care costs as significant predictors of mortality from colorectal cancer. Specifically, mortality was much higher for advanced cancers (especially metastatic disease) compared to localized cancers, consistent with evidence that stage at diagnosis is the most important prognostic factor for colorectal cancer (Du Cancer, 2024). Higher healthcare expenditure was also significantly associated with mortality risk, which may reflect the intensive treatment needs and complications of advanced disease (Balkhi et al., 2023). In contrast, early detection status was not an independent predictor of mortality after controlling for cancer stage and other factors. This finding suggests that the benefits of early detection are mediated primarily through its impact on the diagnostic stage rather than providing an additional survival advantage (McPhail et al., 2015). These results emphasize the importance of early diagnosis of colorectal cancer in improving survival. Thus, the findings support the management of colorectal cancer patients through effective screening programs and allocating adequate healthcare resources to improve patient outcomes, emphasizing the importance of early detection.
 
 ### Limitations
 
--   Discuss possible sources of bias, limitations in data, model assumptions
+-   This observational study limits the ability to establish causal relationships between predictors and mortality outcomes.
 
--   Suggest improvements or next steps
+-   Unmeasured confounders may also have affected the observed associations.
+
+-   The analysis lacks variables that represent systemic and contextual factors that may influence outcomes, such as regional differences in health care services or socioeconomic status.
+
+-   The variable “early detection” is defined very broadly (yes/no indicator of early detection), making its meaning somewhat ambiguous.
 
 ### Potential Further research
 
-Mention anything interesting you found that doesn’t fit elsewhere
+Future studies could use more in-depth analyses to validate and extend these findings and examine the impact of interventions. For example, survival analyses (e.g., using Cox proportional risk models) could incorporate time-to-event data to determine in greater detail when, not just if, death occurs (Collett, 2015).
 
 ## Appendix
 
@@ -668,3 +670,13 @@ Mention anything interesting you found that doesn’t fit elsewhere
 -   Extra plots or tables not essential to the main body
 
 -   Model selection steps
+
+## Reference
+
+Balkhi, B., Alghamdi, A., Alqahtani, S., Najjar, M. A., Harbi, A. A., & Traiki, T. B. (2023). Colorectal cancer-related resource utilization and healthcare costs in Saudi Arabia. *Saudi Pharmaceutical Journal*, *31*(11), 101822. https://doi.org/10.1016/j.jsps.2023.101822
+
+Collett, D. (2015). Modelling Survival Data in Medical Research. In *Chapman and Hall/CRC eBooks*. https://doi.org/10.1201/b18041
+
+Du Cancer, C. C. S. /. S. C. (2024, May 1). *Colorectal cancer statistics*. Canadian Cancer Society. https://cancer.ca/en/cancer-information/cancer-types/colorectal/statistics
+
+McPhail, S., Johnson, S., Greenberg, D., Peake, M., & Rous, B. (2015). Stage at diagnosis and early mortality from cancer in England. *British Journal of Cancer*, *112*(S1), S108–S115. https://doi.org/10.1038/bjc.2015.49
