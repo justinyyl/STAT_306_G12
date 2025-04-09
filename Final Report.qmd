@@ -1,7 +1,10 @@
 ---
 title: ""
 author: ""
-format: pdf
+format:
+  pdf:
+    pdf-engine: xelatex
+    mainfont: "Times New Roman"
 editor: visual
 ---
 
@@ -14,7 +17,7 @@ editor: visual
     \vspace{2cm}
     {\Large Yulin Yuan, Ruohan Sun, Tony Lee\par}
     \vspace{1cm}
-    {\large April 4, 2025\par}
+    {\large April 9, 2025\par}
     \vfill
 \end{titlepage}
 ```
@@ -57,8 +60,6 @@ colorectal_CA <- ca_data %>%
   )
 ```
 
-\newpage
-
 ## Introduction
 
 ### Study Objective
@@ -71,59 +72,67 @@ The dataset we decide to conduct our analysis of Mortality status (Alive/Dead) w
 
 #### Response Variable
 
-\begin{longtable}{|p{4cm}|p{9cm}|p{4cm}|}
-\hline
-\textbf{Variable} & \textbf{Description} & \textbf{Type} \\
-\hline
-Mortality Status & Status of patients' mortality (Yes/No) & Categorical, nominal \\
-\hline
-\end{longtable}
+-   **Mortality Status**\
+    Status of patients' mortality, coded as `Yes` or `No`.
 
 #### Explanatory Variables
 
-\begin{longtable}{|p{4cm}|p{9cm}|p{4cm}|}
-\hline
-\textbf{Variable} & \textbf{Description} & \textbf{Type} \\
-\hline
-Alcohol Consumption & Status of patient's alcohol consumption (Yes/No) & Categorical, nominal \\
-\hline
-Age & Patient's age in years & Numerical, continuous \\
-\hline
-Cancer Stage & Diagnosis stage of cancer (Localized, Regional, Metastatic) & Categorical, ordinal \\
-\hline
-Diabetes & Status of patient's diabetes (Yes/No) & Categorical, nominal \\
-\hline
-Diet Risk & Level of dietary risk (Low, Moderate, High) & Categorical, ordinal \\
-\hline
-Early Detection & Detection of colorectal cancer at an early stage (Yes/No) & Categorical, nominal \\
-\hline
-Family History & Presence of family history of colorectal cancer (Yes/No) & Categorical, nominal \\
-\hline
-Genetic Mutation & Presence of genetic mutations for colorectal cancer (Yes/No) & Categorical, nominal \\
-\hline
-Gender & Gender of the patient (Male/Female) & Categorical, nominal \\
-\hline
-Healthcare Cost & Estimated healthcare expenditure per patient (1,000 units in \$) & Numerical, continuous \\
-\hline
-Inflammatory Bowel Disease & Status of inflammatory bowel disease (Yes/No) & Categorical, nominal \\
-\hline
-Insurance Status & Health insurance coverage (Insured/Uninsured) & Categorical, nominal \\
-\hline
-Obesity BMI & BMI classification (Normal, Overweight, Obese) & Categorical, ordinal \\
-\hline
-Physical Activity & Level of physical activity (Low, Moderate, High) & Categorical, ordinal \\
-\hline
-Screening History & Cancer screening history (Regular, Irregular, Never) & Categorical, ordinal \\
-\hline
-Smoking History & Patient's smoking history (Yes/No) & Categorical, nominal \\
-\hline
-Treatment Type & Type of treatment received (Surgery, Chemotherapy, Radiotherapy, Combination) & Categorical, ordinal \\
-\hline
-Tumor Size & Colorectal tumor size in millimeters (mm) & Numerical, continuous \\
-\hline
-Urban or Rural & Patient's area of residence (Urban/Rural) & Categorical, nominal \\
-\hline
-\end{longtable}
+-   **Alcohol Consumption**\
+    Status of patient's alcohol consumption, coded as `Yes` or `No`.
+
+-   **Age**\
+    Patient's age in years.
+
+-   **Cancer Stage**\
+    Diagnosis stage of cancer, coded as `Localized`, `Regional`, or `Metastatic`.
+
+-   **Diabetes**\
+    Status of patient's diabetes, coded as `Yes` or `No`.
+
+-   **Diet Risk**\
+    Level of dietary risk, coded as `Low`, `Moderate`, or `High`.
+
+-   **Early Detection**\
+    Detection of colorectal cancer at an early stage, coded as `Yes` or `No`.
+
+-   **Family History**\
+    Family history of colorectal cancer, coded as `Yes` or `No`.
+
+-   **Genetic Mutation**\
+    Presence of genetic mutations for colorectal cancer, coded as `Yes` or `No`.
+
+-   **Gender**\
+    Gender of the patient, coded as `Male` or `Female`.
+
+-   **Healthcare Cost**\
+    Estimated healthcare expenditure per patient (in 1,000s of \$).
+
+-   **Inflammatory Bowel Disease**\
+    Presence of inflammatory bowel disease, coded as `Yes` or `No`.
+
+-   **Insurance Status**\
+    Health insurance coverage, coded as `Insured` or `Uninsured`.
+
+-   **Obesity BMI**\
+    BMI classification, coded as `Normal`, `Overweight`, or `Obese`.
+
+-   **Physical Activity**\
+    Level of physical activity, coded as `Low`, `Moderate`, or `High`.
+
+-   **Screening History**\
+    Cancer screening history, coded as `Regular`, `Irregular`, or `Never`.
+
+-   **Smoking History**\
+    Patient’s smoking history, coded as `Yes` or `No`.
+
+-   **Treatment Type**\
+    Type of treatment received, coded as `Surgery`, `Chemotherapy`, `Radiotherapy`, or `Combination`.
+
+-   **Tumor Size**\
+    Colorectal tumor size in millimeters (mm).
+
+-   **Urban or Rural**\
+    Patient's area of residence, coded as `Urban` or `Rural`.
 
 ### Motivation
 
@@ -639,7 +648,7 @@ Early\_DetectionYes     & -0.0081611 & 0.0487565  & -0.167 & 0.86707  &    \\
 
 ...
 
-### Results Interpretation
+#### Results Interpretation
 
 inference results
 
