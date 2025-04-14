@@ -473,6 +473,8 @@ final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 as.ggplot(final_plot)
 ```
 
+Figure 5 provides the linearity assumption by plotting the logit of predicted mortality against each continuous covariates of Age, Tumor Size, Healthcare Costs. The observed linear relations of red line confirm that this logistic regression assumption has been satisfied, and the plots for Age and Tumor Size illustrates relatively constant trends, indicating minimal variation in the slope from linearity and it helps to prove the linear assumption for this study.
+
 #### Feature Selection
 
 ```{r}
@@ -585,7 +587,17 @@ Backward-Selected Model & 9725.6 (df = 7019) & 9735.6 \\
 \end{table}
 ```
 
-...
+The backward selection was performed for finding the optimal number of covariates for predicting mortality from colorectal cancer. This method iteratively removes the least significant variables from the full logistic regression model and selects the best model at each step based on the Akaike Information Criterion (AIC). After selecting the best model of this study, the selected model is evaluated against the full model to confirm the optimal balance between model interpretability (likelihood) and complexity (number of covariates).
+
+Figure 6 illustrates how the AIC value changes during the backward selection process as variables are sequentially removed. Since the AIC preferred the smallest values, the lowest AIC was found in the plot when the number of covariates is 3, and also this process can lead to satisfy the principle of parsimony. Thus, the optimal model includes the following key predictors:
+
+-   **Cancer Stage**
+
+-   **Family History**
+
+-   **Healthcare Costs**
+
+The AIC comparison between the full and backward selection models is summarized in Table 1. The full model, which includes all covariates, resulted in an AIC of 9764.7. In contrast, the optimal model has a lower AIC of 9735.6, indicating that the selected model provides a better balance between interpretability and complexity than the full model.
 
 ### Statistical Analysis
 
