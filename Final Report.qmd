@@ -625,6 +625,16 @@ lrt_result <- anova(reduced_additive_model, reduced_interaction_model, test = "L
 result_additive <- summary(reduced_additive_model)
 ```
 
+To clarify whether including the interaction terms would significantly improve our model's predictive performance, we conducted a likelihood ratio test based on Wilks’ theorem to compare the additive model against a model with interaction terms. \par
+
+We defined the hypothesis as follows:
+
+Null hypothesis $H_0$: logistic regression of additive model is true model
+
+Alternative hypothesis $H_a$: logistic regression of interaction model is true model \par
+
+To perform the hypothesis testing, we set the significance level at 5% ($\alpha$ = 0.05) and the result of test statistic and corresponding p-value are summarized below:
+
 ```{=latex}
 \begin{table}[htbp]
 \centering
@@ -640,9 +650,7 @@ $\chi^2 = 0.549$ & 1 & 0.4586 \\
 \end{table}
 ```
 
-The result suggests the interaction term does not significantly improve model fit.
-
-...
+In table 2, the observed p-value is 0.4586 and it is greater than our pre-specified significance level of $\alpha$ = 0.05. Thus, we fail to reject the null hypothesis and conclude that including interaction terms does not significantly improve model fit. Consequently, simpler additive model of this study ensures interpretability and prevents overfitting by the principle of parsimony.
 
 ```{=latex}
 \begin{table}[ht]
@@ -668,7 +676,7 @@ Early\_DetectionYes     & -0.0081611 & 0.0487565  & -0.167 & 0.86707  &    \\
 
 #### Results Interpretation
 
-inference results
+Table 3 presents the inference results from the logistic regression model.
 
 ## Conclusion
 
