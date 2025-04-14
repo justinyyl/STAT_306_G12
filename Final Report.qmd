@@ -629,9 +629,9 @@ To clarify whether including the interaction terms would significantly improve o
 
 We defined the hypothesis as follows:
 
-Null hypothesis $H_0$: logistic regression of additive model is true model
+-   Null hypothesis $H_0$: logistic regression of additive model is true model
 
-Alternative hypothesis $H_a$: logistic regression of interaction model is true model \par
+-   Alternative hypothesis $H_a$: logistic regression of interaction model is true model \par
 
 To perform the hypothesis testing, we set the significance level at 5% ($\alpha$ = 0.05) and the result of test statistic and corresponding p-value are summarized below:
 
