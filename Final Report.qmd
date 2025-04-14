@@ -419,7 +419,7 @@ final_plot <- arrangeGrob(variance_plot, bottom = caption_grob)
 as.ggplot(final_plot)
 ```
 
-In logistic regression, the variance of the residuals is not constant but is a function of the predicted probability $pi_hat$. We plotted the predicted probabilities from the full model against the binomial variance (Figure 4). The plot showed that the variance is low at extreme predicted probabilities and peaks when $pi_hat$ is almost equal to 0.5, forming the characteristic parabolic shape. The highest uncertainty occurs at about 50% of predicted risk of death, which is consistent with theory and suggests that the model's probability estimates are correct.
+In logistic regression, the variance of the residuals is not constant but is a function of the predicted probability $\hat{\pi}$. We plotted the predicted probabilities from the full model against the binomial variance (Figure 4). The plot showed that the variance is low at extreme predicted probabilities and peaks when $\hat{\pi}$ is almost equal to 0.5, forming the characteristic parabolic shape. The highest uncertainty occurs at about 50% of predicted risk of death, which is consistent with theory and suggests that the model's probability estimates are correct.
 
 **Linearity**
 
