@@ -625,13 +625,17 @@ lrt_result <- anova(reduced_additive_model, reduced_interaction_model, test = "L
 result_additive <- summary(reduced_additive_model)
 ```
 
-To clarify whether including the interaction terms would significantly improve our model's predictive performance, we conducted a likelihood ratio test based on Wilks’ theorem to compare the additive model against a model with interaction terms. \par
+To clarify whether including the interaction terms would significantly improve our model's predictive performance, we conducted a likelihood ratio test based on Wilks’ theorem to compare the additive model against a model with interaction terms.
+
+\par
 
 We defined the hypothesis as follows:
 
 -   Null hypothesis $H_0$: logistic regression of additive model is true model
 
--   Alternative hypothesis $H_a$: logistic regression of interaction model is true model \par
+-   Alternative hypothesis $H_a$: logistic regression of interaction model is true model
+
+    \par
 
 To perform the hypothesis testing, we set the significance level at 5% ($\alpha$ = 0.05) and the result of test statistic and corresponding p-value are summarized below:
 
@@ -706,12 +710,32 @@ Future studies could use more in-depth analyses to validate and extend these fin
 
 -   Model selection steps
 
-## Reference
+<!-- References -->
 
-Balkhi, B., Alghamdi, A., Alqahtani, S., Najjar, M. A., Harbi, A. A., & Traiki, T. B. (2023). Colorectal cancer-related resource utilization and healthcare costs in Saudi Arabia. *Saudi Pharmaceutical Journal*, *31*(11), 101822. https://doi.org/10.1016/j.jsps.2023.101822
+```{=latex}
+\newpage
+\phantomsection
+\addcontentsline{toc}{section}{References}
 
-Collett, D. (2015). Modelling Survival Data in Medical Research. In *Chapman and Hall/CRC eBooks*. https://doi.org/10.1201/b18041
+\begin{center}
+\textbf{\Large References}
+\end{center}
 
-Du Cancer, C. C. S. /. S. C. (2024, May 1). *Colorectal cancer statistics*. Canadian Cancer Society. https://cancer.ca/en/cancer-information/cancer-types/colorectal/statistics
+\noindent\hangindent=0.5in\hangafter=1
+Balkhi, B., Alghamdi, A., Alqahtani, S., Najjar, M. A., Harbi, A. A., \& Traiki, T. B. (2023). Colorectal cancer-related resource utilization and healthcare costs in Saudi Arabia. \textit{Saudi Pharmaceutical Journal, 31}(11), 101822. \href{https://doi.org/10.1016/j.jsps.2023.101822}{https://doi.org/10.1016/j.jsps.2023.101822}
 
-McPhail, S., Johnson, S., Greenberg, D., Peake, M., & Rous, B. (2015). Stage at diagnosis and early mortality from cancer in England. *British Journal of Cancer*, *112*(S1), S108–S115. https://doi.org/10.1038/bjc.2015.49
+\bigskip
+
+\noindent\hangindent=0.5in\hangafter=1
+Collett, D. (2015). \textit{Modelling survival data in medical research}. Chapman and Hall/CRC eBooks. \href{https://doi.org/10.1201/b18041}{https://doi.org/10.1201/b18041}
+
+\bigskip
+
+\noindent\hangindent=0.5in\hangafter=1
+Canadian Cancer Society. (2024, May 1). \textit{Colorectal cancer statistics}. \href{https://cancer.ca/en/cancer-information/cancer-types/colorectal/statistics}{https://cancer.ca/en/cancer-information/cancer-types/colorectal/statistics}
+
+\bigskip
+
+\noindent\hangindent=0.5in\hangafter=1
+McPhail, S., Johnson, S., Greenberg, D., Peake, M., \& Rous, B. (2015). Stage at diagnosis and early mortality from cancer in England. \textit{British Journal of Cancer, 112}(S1), S108--S115. \href{https://doi.org/10.1038/bjc.2015.491}{https://doi.org/10.1038/bjc.2015.491}
+```
