@@ -245,6 +245,8 @@ final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 as.ggplot(final_plot)
 ```
 
+Figure 1 illustrates the distribution before and after balancing the mortality status. Many more patients were alive than dead before balancing the data, which could bias any predictive model. To address this issue, we created a balanced subset by randomly under-sampling Canadian patients with different mortality statuses, producing the same number of “Yes” and “No” patients. This step is critical to ensure that unbalanced mortality outcomes do not compromise subsequent modeling.
+
 #### Continuous Variables
 
 ```{r}
@@ -291,6 +293,8 @@ final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 
 as.ggplot(final_plot)
 ```
+
+Next, we examined continuous variables (age, tumor size, and healthcare costs) that may be associated with mortality status. Figure 2 shows the distribution of these variables between living and dead patients. We found that patients who died tended to be older, had larger tumor sizes, and that medical costs were typically higher for deceased patients compared to the living. The distribution of cost variables (in thousands of dollars) shows a heavier upper tail for the deceased group, suggesting that higher medical expenditures are associated with cases that ultimately result in death. These patterns suggest that advanced age, more significant tumor burden, and higher treatment costs are associated with worse outcomes.
 
 #### Categorical Variables
 
@@ -342,10 +346,6 @@ as.ggplot(final_plot)
 ```
 
 #### Interpretation of Findings
-
-Figure 1 illustrates the distribution before and after balancing the mortality status. Many more patients were alive than dead before balancing the data, which could bias any predictive model. To address this issue, we created a balanced subset by randomly under-sampling Canadian patients with different mortality statuses, producing the same number of “Yes” and “No” patients. This step is critical to ensure that unbalanced mortality outcomes do not compromise subsequent modeling.
-
-Next, we examined continuous variables (age, tumor size, and healthcare costs) that may be associated with mortality status. Figure 2 shows the distribution of these variables between living and dead patients. We found that patients who died tended to be older, had larger tumor sizes, and that medical costs were typically higher for deceased patients compared to the living. The distribution of cost variables (in thousands of dollars) shows a heavier upper tail for the deceased group, suggesting that higher medical expenditures are associated with cases that ultimately result in death. These patterns suggest that advanced age, more significant tumor burden, and higher treatment costs are associated with worse outcomes.
 
 For the categorical variables, we plotted the proportions of patients' mortality status in each category (Figure 3) and observed some strong correlations. The cancer stage at diagnosis was a key factor, with patients with localized disease having a much higher mortality rate than patients with metastatic disease, and even patients with regional disease having a worse mortality rate than metastatic disease. Similarly, variables related to early intervention showed lower mortality in patients with a history of screening and in patients whose cancer was detected at an early stage compared with those who were not screened beforehand or who were not detected early. We also noted the influence of lifestyle and health risk factors, with categories such as smoking history, heavy alcohol consumption, obesity, poor diet and comorbidities tending to have higher mortality rates in the “yes” group than in the “no” group. In contrast, some factors showed little difference in mortality across categories, such as patient gender and family history of colorectal cancer, which did not show a significant difference in mortality status. Overall, advanced cancer and lack of early detection were associated with significantly higher mortality, while healthy behaviors and early cancer screening/detection had higher survival rates. These observed patterns helped us screen which variables may be significant predictors of mortality status, informing our modeling strategy.
 
