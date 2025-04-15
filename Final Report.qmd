@@ -676,11 +676,15 @@ Early\_DetectionYes     & -0.0081611 & 0.0487565  & -0.167 & 0.86707  &    \\
 \end{table}
 ```
 
-...
-
 #### Results Interpretation
 
-Table 3 presents the inference results from the logistic regression model.
+Since the primary goal of this report was to evaluate how healthcare expenditures and early detection of colorectal cancer associated, so the final model included the covariate "Early Detection" with selected variables from the backward selection. To clarify whether including an interaction term between **Early Detection** and **Healthcare Costs** improves the model fit, additive model and one with the interaction term with two covariates model were conducted the likelihood ratio test (LRT) and the results in comparison of goodness of fit between an additive model and a model with an interaction term between the two covariates using ANOVA were summarized in Table 3.
+
+-   **Cancer Stage (Regional):** Since the p-value of cancer stage at regional is statistically significant, thus we conclude that patients diagnosed at the regional stage have significantly lower odds of cancer mortality compared to the localized stage.
+
+-   **Healthcare Cost:** The observed p-value is 0.03301, indicating inverse relationship with mortality and higher spending for patient may correspond to more effective treatments and better outcomes.
+
+-   **Family History and Early Detection:** They are not statistically significant at the 5% level, but Early Detection was retained for the objectives of this study and its practical and theoretical role in influencing the early stage of cancer.
 
 ## Conclusion
 
