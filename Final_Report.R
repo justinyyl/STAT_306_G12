@@ -153,8 +153,8 @@ as.ggplot(final_plot)
 
 # Create Proportion Bar plots for Some key Categorical Covariates of Binary Response
 select_categorical <- c("Cancer_Stage", "Screening_History", "Early_Detection",
-                   "Physical_Activity", "Obesity_BMI", "Diet_Risk")
-categorical_cols <- c("Cancer Stage", "Screening History", "Early Detection", "Physical Activity", " Obesity BMI", "Diet Risk" )
+                   "Gender", "Obesity_BMI", "Diet_Risk")
+categorical_cols <- c("Cancer Stage", "Screening History", "Early Detection", "Gender", " Obesity BMI", "Diet Risk" )
 
 my_list <- list()
 for (i in seq_along(select_categorical)) {
@@ -215,10 +215,10 @@ variance_plot <- ggplot(data.frame(fitted_probs, binomial_var), aes(x = fitted_p
   ) +
  scale_x_continuous(
   breaks = seq(0.45, 0.55, by = 0.01), limits = c(0.44, 0.56)) +
-  theme_minimal(base_size = 13)
+  theme_minimal(base_size = 8)
 
 caption_grob <- textGrob("Figure 4: Variance peaks at predicted probability = 0.5.",
-                         gp = gpar(fontface = "bold.italic", fontsize = 11), 
+                         gp = gpar(fontface = "bold.italic", fontsize = 10), 
                          hjust = 0.5, vjust = 0.3)
 
 final_plot <- arrangeGrob(variance_plot, bottom = caption_grob)

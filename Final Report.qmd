@@ -60,22 +60,22 @@ colorectal_CA <- ca_data %>%
   )
 ```
 
-## Introduction
+## 1. Introduction
 
-### Study Objective
+### 1.1 Study Objective
 
 The objective of this study is to evaluate how healthcare expenditures and early detection of colorectal cancer are associated with patient mortality outcomes in Canada. Our goal is to explore whether patients whose cancer is detected at an early stage, and those who bear different levels of healthcare costs, exhibit significantly different mortality rates. Through statistical analysis of available data, we will quantify the strength of these associations and assess their significance. We can build on the findings of this study to inform healthcare decisions, such as emphasizing effective screening programs and optimizing the use of healthcare resources to improve patient outcomes.
 
-### Dataset Overview
+### 1.2 Dataset Overview
 
 The dataset we decide to conduct our analysis of Mortality status (Alive/Dead) was sourced from Kaggle, which the dataset name is “Colorectal Cancer Global Dataset & Predictions”. For the objective of this project, we only considered the data from Canada, which includes patient demographics, lifestyle risks, medical history, cancer stage, treatment types, survival chances, and healthcare costs. Key variables of we are going to investigate as follows:
 
-#### Response Variable
+#### 1.2.1 Response Variable
 
 -   **Mortality Status**\
     Status of patients' mortality, coded as `Yes` or `No`.
 
-#### Explanatory Variables
+#### 1.2.2 Explanatory Variables
 
 -   **Alcohol Consumption**\
     Status of patient's alcohol consumption, coded as `Yes` or `No`.
@@ -134,13 +134,13 @@ The dataset we decide to conduct our analysis of Mortality status (Alive/Dead) w
 -   **Urban or Rural**\
     Patient's area of residence, coded as `Urban` or `Rural`.
 
-### Motivation
+### 1.3 Motivation
 
 Colorectal cancer is one of the most common cancers in Canada, and it is predicted that rectal cancer will be the fourth most common cancer in Canada by 2024, making it critical to understand the factors that influence mortality (Du Cancer, 2024). Analyzing mortality in relation to healthcare costs and early detection is crucial because it addresses issues at the intersection of patient care and healthcare policy. It is widely recognized that the earlier a cancer is detected, the higher the chance of survival, so examining the impact of early detection of rectal cancer on mortality with actual patient data can help quantify the benefits of screening and early diagnosis efforts in Canada. Similarly, health care expenditures per patient can broadly reflect the intensity or quality of treatment received. Examining the relationship between healthcare expenditure and survival can help determine whether resources could be used more efficiently. By focusing on Canadian patients, we eliminate cross-national differences in healthcare systems, thereby providing a clearer understanding of the role of these factors within the context of a single-country healthcare system.
 
-## Analysis
+## 2. Analysis
 
-### Exploratory Data Analysis (EDA)
+### 2.1 Exploratory Data Analysis (EDA)
 
 ```{r}
 #| echo: false
@@ -178,7 +178,7 @@ for (colname in categorical) {
 }
 ```
 
-#### Balance of Response Variable
+#### 2.1.1 Balance of Response Variable
 
 ```{r}
 #| echo: false
@@ -247,7 +247,7 @@ as.ggplot(final_plot)
 
 Figure 1 illustrates the distribution before and after balancing the mortality status. Many more patients were alive than dead before balancing the data, which could bias any predictive model. To address this issue, we created a balanced subset by randomly under-sampling Canadian patients with different mortality statuses, producing the same number of “Yes” and “No” patients. This step is critical to ensure that unbalanced mortality outcomes do not compromise subsequent modeling.
 
-#### Continuous Variables
+#### 2.1.2 Continuous Variables
 
 ```{r}
 #| echo: false
@@ -296,7 +296,7 @@ as.ggplot(final_plot)
 
 Next, we examined continuous variables (age, tumor size, and healthcare costs) that may be associated with mortality status. Figure 2 shows the distribution of these variables between living and dead patients. We found that patients who died tended to be older, had larger tumor sizes, and that medical costs were typically higher for deceased patients compared to the living. The distribution of cost variables (in thousands of dollars) shows a heavier upper tail for the deceased group, suggesting that higher medical expenditures are associated with cases that ultimately result in death. These patterns suggest that advanced age, more significant tumor burden, and higher treatment costs are associated with worse outcomes.
 
-#### Categorical Variables
+#### 2.1.3 Categorical Variables
 
 ```{r}
 #| echo: false
@@ -307,8 +307,8 @@ Next, we examined continuous variables (age, tumor size, and healthcare costs) t
 
 # Create Proportion Bar plots for Some key Categorical Covariates of Binary Response
 select_categorical <- c("Cancer_Stage", "Screening_History", "Early_Detection",
-                   "Physical_Activity", "Obesity_BMI", "Diet_Risk")
-categorical_cols <- c("Cancer Stage", "Screening History", "Early Detection", "Physical Activity", " Obesity BMI", "Diet Risk" )
+                   "Gender", "Obesity_BMI", "Diet_Risk")
+categorical_cols <- c("Cancer Stage", "Screening History", "Early Detection", "Gender", " Obesity BMI", "Diet Risk" )
 
 my_list <- list()
 for (i in seq_along(select_categorical)) {
@@ -348,15 +348,15 @@ final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 as.ggplot(final_plot)
 ```
 
-For the categorical variables, we plotted the proportions of patients' mortality status in each category (Figure 3). The cancer stage at diagnosis was a key factor, with patients with localized disease having a much higher mortality rate than patients with metastatic disease and regional disease. Similarly, variables related to early intervention showed lower mortality in patients with a history of screening and in patients whose cancer was detected at an early stage compared with those who were not screened beforehand or who were not detected early. We also noted the influence of lifestyle and health risk factors, with categories such as obesity and poor diet tending to have higher mortality rates in the “yes” group than in the “no” group. In contrast, some factors, such as patient gender, showed little difference in mortality across categories, as the appendix will show in detail.
+For the categorical variables, we plotted the proportions of patients’ mortality status in selected categories in Figure 3. Patients with localized cancer, regular screening, and early detection had notably lower mortality rates compared to those with metastatic or regional disease, or those who were not screened or detected early. This underscores the critical role of early intervention in improving survival outcomes. Likewise, lifestyle and health-related factors played an important role—patients categorized as obese or at high diet risk tended to show significantly higher mortality than their counterparts. These findings emphasize the potential impact of modifiable risk factors on patient prognosis. In contrast, variables like gender showed minimal differences in mortality, as further detailed in Appendix A.
 
-### Model Choice and Reasoning
+### 2.2 Model Choice and Reasoning
 
-#### Logistic Regression
+#### 2.2.1 Logistic Regression
 
 Given the binary nature of the outcome (mortality: dead or alive), we chose a logistic regression model to quantify the association between the covariates and mortality. The model was applied to dichotomous responses and provided interpretable coefficients based on the odds ratio of mortality. EDA revealed a strong effect of cancer stage and early detection on the results, suggesting that a multivariate logistic approach would help analyze the model while controlling for other factors. Before fitting the model, we ensured that the key assumptions:
 
-#### Assumption Check
+#### 2.2.2 Assumption Check
 
 ```{r}
 #| echo: false
@@ -369,7 +369,7 @@ full_model <- glm(Mortality ~ ., data = balanced_data, family = binomial)
 
 **Binary Response**
 
-The response variable is binary by definition, satisfying the requirement for logistic regression. We coded “Mortality” as a factor with two levels (Alive/Dead) and used the balanced dataset for modeling.
+The response variable is binary by definition, satisfying the requirement for logistic regression. We coded “Mortality” as a factor with two levels (Alive/Dead).
 
 **Independence**
 
@@ -390,8 +390,8 @@ Each record corresponds to a unique patient, and we confirmed there were no dupl
 #| echo: false
 #| message: false
 #| warning: false
-#| fig-width: 7
-#| fig-height: 3
+#| fig-width: 6
+#| fig-height: 2
 
 # Compute predicted probabilities
 fitted_probs <- fitted(full_model)
@@ -409,10 +409,10 @@ variance_plot <- ggplot(data.frame(fitted_probs, binomial_var), aes(x = fitted_p
   ) +
  scale_x_continuous(
   breaks = seq(0.45, 0.55, by = 0.01), limits = c(0.44, 0.56)) +
-  theme_minimal(base_size = 13)
+  theme_minimal(base_size = 8)
 
 caption_grob <- textGrob("Figure 4: Variance peaks at predicted probability = 0.5.",
-                         gp = gpar(fontface = "bold.italic", fontsize = 11), 
+                         gp = gpar(fontface = "bold.italic", fontsize = 10), 
                          hjust = 0.5, vjust = 0.3)
 
 final_plot <- arrangeGrob(variance_plot, bottom = caption_grob)
@@ -420,7 +420,7 @@ final_plot <- arrangeGrob(variance_plot, bottom = caption_grob)
 as.ggplot(final_plot)
 ```
 
-In logistic regression, the variance of the residuals is not constant but is a function of the predicted probability $\hat{\pi}$. We plotted the predicted probabilities from the full model against the binomial variance (Figure 4). The plot showed that the variance is low at extreme predicted probabilities and peaks when $\hat{\pi}$ is almost equal to 0.5, forming the characteristic parabolic shape. The highest uncertainty occurs at about 50% of predicted risk of death, which is consistent with theory and suggests that the model's probability estimates are correct.
+In logistic regression, the variance of the residuals is a function of the predicted probability $\hat{\pi}$. We plotted the predicted probabilities from the full model against the binomial variance in Figure 4. The plot shows a parabolic pattern, with variance peaking at $\hat{\pi} = 0.5$ and lowest at the extremes, aligning with theory and supporting the model’s probability estimates.
 
 **Linearity**
 
@@ -476,7 +476,7 @@ as.ggplot(final_plot)
 
 Figure 5 provides the linearity assumption by plotting the logit of predicted mortality against each continuous covariates of Age, Tumor Size, Healthcare Costs. The observed linear relations of red line confirm that this logistic regression assumption has been satisfied, and the plots for Age and Tumor Size illustrates relatively constant trends, indicating minimal variation in the slope from linearity and it helps to prove the linear assumption for this study.
 
-#### Feature Selection
+#### 2.2.3 Feature Selection
 
 ```{=latex}
 \begin{table}[ht]
@@ -494,7 +494,7 @@ Backward-Selected Model & 9725.6 (df = 7019) & 9735.6 \\
 \end{table}
 ```
 
-The backward selection was performed for finding the optimal number of covariates for predicting mortality from colorectal cancer. This method iteratively removes the least significant variables from the full logistic regression model and selects the best model at each step based on the Akaike Information Criterion (AIC). After selecting the best model of this study, the selected model is evaluated against the full model to confirm the optimal balance between model interpretability (likelihood) and complexity (number of covariates).Since the AIC preferred the smallest values, the lowest AIC was found in the plot when the number of covariates is 3, and also this process can lead to satisfy the principle of parsimony. Thus, the optimal model includes the following key predictors:
+Backward selection was used to identify the optimal number of covariates for predicting mortality from colorectal cancer. This method iteratively removes the least significant variables from the full logistic regression model, selecting the best model at each step based on the Akaike Information Criterion (AIC). As shown in Appendix B, the lowest AIC was achieved with three covariates, suggesting an optimal balance between model fit and complexity, and also this process can lead to satisfy the principle of parsimony. The final model includes the following key predictors:
 
 -   **Cancer Stage**
 
@@ -504,7 +504,7 @@ The backward selection was performed for finding the optimal number of covariate
 
 The AIC comparison between the full and backward selection models is summarized in Table 1. The full model, which includes all covariates, resulted in an AIC of 9764.7. In contrast, the optimal model has a lower AIC of 9735.6, indicating that the selected model provides a better balance between interpretability and complexity than the full model.
 
-### Statistical Analysis
+### 2.3 Statistical Analysis
 
 ```{r}
 #| echo: false
@@ -560,7 +560,7 @@ $\chi^2 = 0.549$ & 1 & 0.4586 \\
 \end{table}
 ```
 
-In table 2, the observed p-value is 0.4586 and it is greater than our pre-specified significance level of $\alpha$ = 0.05. Thus, we fail to reject the null hypothesis and conclude that including interaction terms does not significantly improve model fit. Consequently, simpler additive model of this study ensures interpretability and prevents overfitting by the principle of parsimony.
+In Table 2, the observed p-value is 0.4586 and it is greater than our pre-specified significance level of $\alpha$ = 0.05. Thus, we fail to reject the null hypothesis and conclude that including interaction terms does not significantly improve model fit. Consequently, simpler additive model of this study ensures interpretability and prevents overfitting by the principle of parsimony.
 
 ```{=latex}
 \begin{table}[ht]
@@ -583,7 +583,7 @@ Early\_DetectionYes     & -0.0081611 & 0.0487565  & -0.167 & 0.86707  &    \\
 \end{table}
 ```
 
-#### Results Interpretation
+#### 2.3.1 Results Interpretation
 
 Since the primary goal of this report was to evaluate how healthcare expenditures and early detection of colorectal cancer associated, so the final model included the covariate "Early Detection" with selected variables from the backward selection. To clarify whether including an interaction term between **Early Detection** and **Healthcare Costs** improves the model fit, additive model and one with the interaction term with two covariates model were conducted the likelihood ratio test (LRT) and the results in comparison of goodness of fit between an additive model and a model with an interaction term between the two covariates using ANOVA were summarized in Table 3.
 
@@ -593,13 +593,13 @@ Since the primary goal of this report was to evaluate how healthcare expenditure
 
 -   **Family History and Early Detection:** They are not statistically significant at the 5% level, but Early Detection was retained for the objectives of this study and its practical and theoretical role in influencing the early stage of cancer.
 
-## Conclusion
+## 3. Conclusion
 
-### Main Findings
+### 3.1 Main Findings
 
 This analysis identified colorectal cancer stage at diagnosis and patient health care costs as significant predictors of mortality from colorectal cancer. Specifically, mortality was much higher for advanced cancers (especially metastatic disease) compared to localized cancers, consistent with evidence that stage at diagnosis is the most important prognostic factor for colorectal cancer (Du Cancer, 2024). Higher healthcare expenditure was also significantly associated with mortality risk, which may reflect the intensive treatment needs and complications of advanced disease (Balkhi et al., 2023). In contrast, early detection status was not an independent predictor of mortality after controlling for cancer stage and other factors. This finding suggests that the benefits of early detection are mediated primarily through its impact on the diagnostic stage rather than providing an additional survival advantage (McPhail et al., 2015). These results emphasize the importance of early diagnosis of colorectal cancer in improving survival. Thus, the findings support the management of colorectal cancer patients through effective screening programs and allocating adequate healthcare resources to improve patient outcomes, emphasizing the importance of early detection.
 
-### Limitations
+### 3.2 Limitations
 
 -   This observational study limits the ability to establish causal relationships between predictors and mortality outcomes.
 
@@ -609,13 +609,13 @@ This analysis identified colorectal cancer stage at diagnosis and patient health
 
 -   The variable “early detection” is defined very broadly (yes/no indicator of early detection), making its meaning somewhat ambiguous.
 
-### Potential Further research
+### 3.3 Potential Further research
 
 Future studies could use more in-depth analyses to validate and extend these findings and examine the impact of interventions. For example, survival analyses (e.g., using Cox proportional risk models) could incorporate time-to-event data to determine in greater detail when, not just if, death occurs (Collett, 2015).
 
 \newpage
 
-## Appendix
+## 4. Appendix
 
 ```{r}
 #| echo: false
@@ -663,6 +663,8 @@ final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 
 as.ggplot(final_plot)
 ```
+
+\vspace{1cm}
 
 ```{r}
 #| echo: false
