@@ -151,11 +151,14 @@ final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 
 as.ggplot(final_plot)
 
-# Create Proportion Bar plots for Categorical Covariates of Binary Response
-categorical_cols <- c("Gender", "Cancer Stage", "Family History", "Smoking History", "Alcohol Consumption", "Obesity BMI", "Diet Risk", "Physical Activity", "Diabetes", "Inflammatory Bowel Disease", "Genetic Mutation", " Screening History", "Early Detection", "Treatment Type", "Urban or Rural", "Insurance Status")
+# Create Proportion Bar plots for Some key Categorical Covariates of Binary Response
+select_categorical <- c("Cancer_Stage", "Screening_History", "Early_Detection",
+                   "Physical_Activity", "Obesity_BMI", "Diet_Risk")
+categorical_cols <- c("Cancer Stage", "Screening History", "Early Detection", "Physical Activity", " Obesity BMI", "Diet Risk" )
+
 my_list <- list()
-for (i in seq_along(categorical)) {
-  feat <- categorical[i]
+for (i in seq_along(select_categorical)) {
+  feat <- select_categorical[i]
   feat_plot <- ggplot(balanced_data, aes_string(x = feat, fill = resp)) +
     geom_bar(position = "fill", , alpha = 0.6) +
     scale_y_continuous(labels = scales::percent_format()) +
@@ -166,23 +169,23 @@ for (i in seq_along(categorical)) {
     ) +
     scale_fill_manual(values = c("blue", "red"), labels = c("Alive", "Dead")) +
     guides(fill = guide_legend(title = "Mortality")) +
-    theme_minimal(base_size = 32) +
+    theme_minimal(base_size = 16) +
     theme(
-      plot.title = element_text(hjust = 0.5, size = 36),
-      axis.title = element_text(size = 32),
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 28),
-      axis.text.y = element_text(size = 28),
-      legend.title = element_text(size = 30),
-      legend.text = element_text(size = 28)
+      plot.title = element_text(hjust = 0.5, size = 14),
+      axis.title = element_text(size = 14),
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
+      axis.text.y = element_text(size = 14),
+      legend.title = element_text(size = 14),
+      legend.text = element_text(size = 14)
     )
   
   my_list[[i]] <- feat_plot
 }
 
-combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 4))
+combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 3))
 
-caption_grob <- textGrob("Figure 3: Proportion Bar plots for Categorical variables by mortality status",
-                         gp = gpar(fontface = "bold.italic", fontsize = 62), 
+caption_grob <- textGrob("Figure 3: Proportion bar plots for some categorical variables by mortality status",
+                         gp = gpar(fontface = "bold.italic", fontsize = 23), 
                          hjust = 0.5,
                          vjust = 0.3)
 
@@ -255,10 +258,67 @@ combined_plot <- do.call(arrangeGrob, c(logit_plot_list, ncol = 3))
 
 caption_grob <- textGrob(
   "Figure 5: Linearity check — logit of mortality plotted against continuous variables",
-  gp = gpar(fontface = "bold.italic", fontsize = 17), 
+  gp = gpar(fontface = "bold.italic", fontsize = 16), 
   hjust = 0.5,
   vjust = 0.3
 )
+
+final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
+
+as.ggplot(final_plot)
+
+# Add losing covarite of interest back to backward selected model
+reduced_additive_model <- glm(
+  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs + Early_Detection,
+  family = binomial, data = balanced_data
+  )
+
+# fit interaction term with two covariates of interest
+reduced_interaction_model <- glm(
+  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs * Early_Detection,
+  family = binomial, data = balanced_data
+  )
+
+# Use ANOVA for goodness-of-fit test
+lrt_result <- anova(reduced_additive_model, reduced_interaction_model, test = "LRT")
+
+# Summary result for additive model
+result_additive <- summary(reduced_additive_model)
+
+# Create Proportion Bar plots for Categorical Covariates of Binary Response
+categorical_cols <- c("Gender", "Cancer Stage", "Family History", "Smoking History", "Alcohol Consumption", "Obesity BMI", "Diet Risk", "Physical Activity", "Diabetes", "Inflammatory Bowel Disease", "Genetic Mutation", " Screening History", "Early Detection", "Treatment Type", "Urban or Rural", "Insurance Status")
+my_list <- list()
+for (i in seq_along(categorical)) {
+  feat <- categorical[i]
+  feat_plot <- ggplot(balanced_data, aes_string(x = feat, fill = resp)) +
+    geom_bar(position = "fill", , alpha = 0.6) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    labs(
+      #title = paste("Mortality Proportion by", categorical_cols[i]),
+      x = categorical_cols[i],
+      y = "Proportion"
+    ) +
+    scale_fill_manual(values = c("blue", "red"), labels = c("Alive", "Dead")) +
+    guides(fill = guide_legend(title = "Mortality")) +
+    theme_minimal(base_size = 32) +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 36),
+      axis.title = element_text(size = 32),
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 28),
+      axis.text.y = element_text(size = 28),
+      legend.title = element_text(size = 30),
+      legend.text = element_text(size = 28)
+    )
+  
+  my_list[[i]] <- feat_plot
+}
+
+combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 4))
+
+caption_grob <- textGrob("Appendix A: Proportion bar plots for all categorical variables by mortality status",
+                         gp = gpar(fontface = "bold.italic", fontsize = 48), 
+                         hjust = 0.5,
+                         vjust = 0.3)
 
 final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 
@@ -326,8 +386,8 @@ aic_plot <- ggplot(best_models, aes(x = Num_Covariates, y = AIC)) +
   scale_x_continuous(breaks = best_models$Num_Covariates)
 
 # Caption as a grob (bold + italic)
-caption_grob <- textGrob("Figure 6: AIC vs Number of Covariates – demonstrating backward feature selection.",
-                         gp = gpar(fontface = "bold.italic", fontsize = 9),
+caption_grob <- textGrob("Appendix B: AIC vs Number of Covariates – demonstrating backward feature selection.",
+                         gp = gpar(fontface = "bold.italic", fontsize = 10),
                          hjust = 0.5, vjust = 0.3)
 
 # Combine plot and caption
@@ -335,31 +395,3 @@ final_plot <- arrangeGrob(aic_plot, bottom = caption_grob)
 
 # Convert to ggplot object
 as.ggplot(final_plot)
-
-# Fit full model
-full_model <- glm(Mortality ~., data = balanced_data, family = binomial)
-
-# Perform backward selection
-backward_model <- step(full_model, direction = "backward", trace = 0)
-
-# View summary of selected model
-summay_backward <- summary(backward_model)
-summary_full <- summary(full_model)
-
-# Add losing covarite of interest back to backward selected model
-reduced_additive_model <- glm(
-  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs + Early_Detection,
-  family = binomial, data = balanced_data
-  )
-
-# fit interaction term with two covariates of interest
-reduced_interaction_model <- glm(
-  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs * Early_Detection,
-  family = binomial, data = balanced_data
-  )
-
-# Use ANOVA for goodness-of-fit test
-lrt_result <- anova(reduced_additive_model, reduced_interaction_model, test = "LRT")
-
-# Summary result for additive model
-result_additive <- summary(reduced_additive_model)

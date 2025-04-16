@@ -302,14 +302,17 @@ Next, we examined continuous variables (age, tumor size, and healthcare costs) t
 #| echo: false
 #| message: false
 #| warning: false
-#| fig-width: 40
-#| fig-height: 30
+#| fig-width: 15
+#| fig-height: 6
 
-# Create Proportion Bar plots for Categorical Covariates of Binary Response
-categorical_cols <- c("Gender", "Cancer Stage", "Family History", "Smoking History", "Alcohol Consumption", "Obesity BMI", "Diet Risk", "Physical Activity", "Diabetes", "Inflammatory Bowel Disease", "Genetic Mutation", " Screening History", "Early Detection", "Treatment Type", "Urban or Rural", "Insurance Status")
+# Create Proportion Bar plots for Some key Categorical Covariates of Binary Response
+select_categorical <- c("Cancer_Stage", "Screening_History", "Early_Detection",
+                   "Physical_Activity", "Obesity_BMI", "Diet_Risk")
+categorical_cols <- c("Cancer Stage", "Screening History", "Early Detection", "Physical Activity", " Obesity BMI", "Diet Risk" )
+
 my_list <- list()
-for (i in seq_along(categorical)) {
-  feat <- categorical[i]
+for (i in seq_along(select_categorical)) {
+  feat <- select_categorical[i]
   feat_plot <- ggplot(balanced_data, aes_string(x = feat, fill = resp)) +
     geom_bar(position = "fill", , alpha = 0.6) +
     scale_y_continuous(labels = scales::percent_format()) +
@@ -320,23 +323,23 @@ for (i in seq_along(categorical)) {
     ) +
     scale_fill_manual(values = c("blue", "red"), labels = c("Alive", "Dead")) +
     guides(fill = guide_legend(title = "Mortality")) +
-    theme_minimal(base_size = 32) +
+    theme_minimal(base_size = 16) +
     theme(
-      plot.title = element_text(hjust = 0.5, size = 36),
-      axis.title = element_text(size = 32),
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 28),
-      axis.text.y = element_text(size = 28),
-      legend.title = element_text(size = 30),
-      legend.text = element_text(size = 28)
+      plot.title = element_text(hjust = 0.5, size = 14),
+      axis.title = element_text(size = 14),
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
+      axis.text.y = element_text(size = 14),
+      legend.title = element_text(size = 14),
+      legend.text = element_text(size = 14)
     )
   
   my_list[[i]] <- feat_plot
 }
 
-combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 4))
+combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 3))
 
-caption_grob <- textGrob("Figure 3: Proportion Bar plots for Categorical variables by mortality status",
-                         gp = gpar(fontface = "bold.italic", fontsize = 62), 
+caption_grob <- textGrob("Figure 3: Proportion bar plots for some categorical variables by mortality status",
+                         gp = gpar(fontface = "bold.italic", fontsize = 23), 
                          hjust = 0.5,
                          vjust = 0.3)
 
@@ -344,8 +347,6 @@ final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
 
 as.ggplot(final_plot)
 ```
-
-#### Interpretation of Findings
 
 For the categorical variables, we plotted the proportions of patients' mortality status in each category (Figure 3) and observed some strong correlations. The cancer stage at diagnosis was a key factor, with patients with localized disease having a much higher mortality rate than patients with metastatic disease, and even patients with regional disease having a worse mortality rate than metastatic disease. Similarly, variables related to early intervention showed lower mortality in patients with a history of screening and in patients whose cancer was detected at an early stage compared with those who were not screened beforehand or who were not detected early. We also noted the influence of lifestyle and health risk factors, with categories such as smoking history, heavy alcohol consumption, obesity, poor diet and comorbidities tending to have higher mortality rates in the “yes” group than in the “no” group. In contrast, some factors showed little difference in mortality across categories, such as patient gender and family history of colorectal cancer, which did not show a significant difference in mortality status. Overall, advanced cancer and lack of early detection were associated with significantly higher mortality, while healthy behaviors and early cancer screening/detection had higher survival rates. These observed patterns helped us screen which variables may be significant predictors of mortality status, informing our modeling strategy.
 
@@ -427,7 +428,7 @@ In logistic regression, the variance of the residuals is not constant but is a f
 #| echo: false
 #| message: false
 #| warning: false
-#| fig-height: 5
+#| fig-height: 3
 #| fig-width: 10
 
 # Get the logit (link) values
@@ -463,7 +464,7 @@ combined_plot <- do.call(arrangeGrob, c(logit_plot_list, ncol = 3))
 
 caption_grob <- textGrob(
   "Figure 5: Linearity check — logit of mortality plotted against continuous variables",
-  gp = gpar(fontface = "bold.italic", fontsize = 17), 
+  gp = gpar(fontface = "bold.italic", fontsize = 16), 
   hjust = 0.5,
   vjust = 0.3
 )
@@ -477,10 +478,198 @@ Figure 5 provides the linearity assumption by plotting the logit of predicted mo
 
 #### Feature Selection
 
+```{=latex}
+\begin{table}[ht]
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{Model} & \textbf{Residual Deviance} & \textbf{AIC} \\
+\hline
+Full Model              & 9710.7 (df = 6997) & 9764.7 \\
+Backward-Selected Model & 9725.6 (df = 7019) & 9735.6 \\
+\hline
+\end{tabular}
+\caption{Residual Deviance and AIC between the backward-selected and full models}
+\label{tab:model_comparison}
+\end{table}
+```
+
+The backward selection was performed for finding the optimal number of covariates for predicting mortality from colorectal cancer. This method iteratively removes the least significant variables from the full logistic regression model and selects the best model at each step based on the Akaike Information Criterion (AIC). After selecting the best model of this study, the selected model is evaluated against the full model to confirm the optimal balance between model interpretability (likelihood) and complexity (number of covariates).Since the AIC preferred the smallest values, the lowest AIC was found in the plot when the number of covariates is 3, and also this process can lead to satisfy the principle of parsimony. Thus, the optimal model includes the following key predictors:
+
+-   **Cancer Stage**
+
+-   **Family History**
+
+-   **Healthcare Costs**
+
+The AIC comparison between the full and backward selection models is summarized in Table 1. The full model, which includes all covariates, resulted in an AIC of 9764.7. In contrast, the optimal model has a lower AIC of 9735.6, indicating that the selected model provides a better balance between interpretability and complexity than the full model.
+
+### Statistical Analysis
+
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
+
+# Add losing covarite of interest back to backward selected model
+reduced_additive_model <- glm(
+  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs + Early_Detection,
+  family = binomial, data = balanced_data
+  )
+
+# fit interaction term with two covariates of interest
+reduced_interaction_model <- glm(
+  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs * Early_Detection,
+  family = binomial, data = balanced_data
+  )
+
+# Use ANOVA for goodness-of-fit test
+lrt_result <- anova(reduced_additive_model, reduced_interaction_model, test = "LRT")
+
+# Summary result for additive model
+result_additive <- summary(reduced_additive_model)
+```
+
+To clarify whether including the interaction terms would significantly improve our model's predictive performance, we conducted a likelihood ratio test based on Wilks’ theorem to compare the additive model against a model with interaction terms.
+
+\par
+
+We defined the hypothesis as follows:
+
+-   $H_0$: logistic regression of additive model is true model
+
+-   $H_a$: model with interaction of Healthcare_Costs and Early_Detection is true model
+
+    \par
+
+To perform the hypothesis testing, we set the significance level at 5% ($\alpha$ = 0.05) and the result of test statistic and corresponding p-value are summarized below:
+
+```{=latex}
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Test Statistic} & \textbf{Degrees of Freedom} & \textbf{p-value} \\
+\hline
+$\chi^2 = 0.549$ & 1 & 0.4586 \\
+\hline
+\end{tabular}
+\captionsetup{labelfont=bf, textfont=bf}
+\caption{Wilks' likelihood ratio test comparison for Additive and Interaction}
+\label{tab:wilks-lrt}
+\end{table}
+```
+
+In table 2, the observed p-value is 0.4586 and it is greater than our pre-specified significance level of $\alpha$ = 0.05. Thus, we fail to reject the null hypothesis and conclude that including interaction terms does not significantly improve model fit. Consequently, simpler additive model of this study ensures interpretability and prevents overfitting by the principle of parsimony.
+
+```{=latex}
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrrl}
+\hline
+\textbf{Predictor} & \textbf{Estimate} & \textbf{Std. Error} & \textbf{z value} & \textbf{Pr($\mathbf{> |z|}$)} & \textbf{Significance} \\
+\hline
+(Intercept)              & 0.2256713  & 0.0804475  & 2.805  & 0.00503  & ** \\
+Cancer\_StageMetastatic & -0.0707315 & 0.0648033  & -1.091 & 0.27506  &    \\
+Cancer\_StageRegional   & -0.1151017 & 0.0537461  & -2.142 & 0.03223  & *  \\
+Family\_HistoryYes      & -0.0817314 & 0.0520083  & -1.572 & 0.11607  &    \\
+Healthcare\_Costs       & -0.0018622 & 0.0008735  & -2.132 & 0.03301  & *  \\
+Early\_DetectionYes     & -0.0081611 & 0.0487565  & -0.167 & 0.86707  &    \\
+\hline
+\end{tabular}
+\captionsetup{labelfont=bf, textfont=bf}
+\caption{Regression output with significance levels: * p < 0.05, ** p < 0.01}
+\label{tab:regression_output}
+\end{table}
+```
+
+#### Results Interpretation
+
+Since the primary goal of this report was to evaluate how healthcare expenditures and early detection of colorectal cancer associated, so the final model included the covariate "Early Detection" with selected variables from the backward selection. To clarify whether including an interaction term between **Early Detection** and **Healthcare Costs** improves the model fit, additive model and one with the interaction term with two covariates model were conducted the likelihood ratio test (LRT) and the results in comparison of goodness of fit between an additive model and a model with an interaction term between the two covariates using ANOVA were summarized in Table 3.
+
+-   **Cancer Stage (Regional):** Since the p-value of cancer stage at regional is statistically significant, thus we conclude that patients diagnosed at the regional stage have significantly lower odds of cancer mortality compared to the localized stage.
+
+-   **Healthcare Cost:** The observed p-value is 0.03301, indicating inverse relationship with mortality and higher spending for patient may correspond to more effective treatments and better outcomes.
+
+-   **Family History and Early Detection:** They are not statistically significant at the 5% level, but Early Detection was retained for the objectives of this study and its practical and theoretical role in influencing the early stage of cancer.
+
+## Conclusion
+
+### Main Findings
+
+This analysis identified colorectal cancer stage at diagnosis and patient health care costs as significant predictors of mortality from colorectal cancer. Specifically, mortality was much higher for advanced cancers (especially metastatic disease) compared to localized cancers, consistent with evidence that stage at diagnosis is the most important prognostic factor for colorectal cancer (Du Cancer, 2024). Higher healthcare expenditure was also significantly associated with mortality risk, which may reflect the intensive treatment needs and complications of advanced disease (Balkhi et al., 2023). In contrast, early detection status was not an independent predictor of mortality after controlling for cancer stage and other factors. This finding suggests that the benefits of early detection are mediated primarily through its impact on the diagnostic stage rather than providing an additional survival advantage (McPhail et al., 2015). These results emphasize the importance of early diagnosis of colorectal cancer in improving survival. Thus, the findings support the management of colorectal cancer patients through effective screening programs and allocating adequate healthcare resources to improve patient outcomes, emphasizing the importance of early detection.
+
+### Limitations
+
+-   This observational study limits the ability to establish causal relationships between predictors and mortality outcomes.
+
+-   Unmeasured confounders may also have affected the observed associations.
+
+-   The analysis lacks variables that represent systemic and contextual factors that may influence outcomes, such as regional differences in health care services or socioeconomic status.
+
+-   The variable “early detection” is defined very broadly (yes/no indicator of early detection), making its meaning somewhat ambiguous.
+
+### Potential Further research
+
+Future studies could use more in-depth analyses to validate and extend these findings and examine the impact of interventions. For example, survival analyses (e.g., using Cox proportional risk models) could incorporate time-to-event data to determine in greater detail when, not just if, death occurs (Collett, 2015).
+
+\newpage
+
+## Appendix
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 30
+#| fig-height: 20
+
+# Create Proportion Bar plots for Categorical Covariates of Binary Response
+categorical_cols <- c("Gender", "Cancer Stage", "Family History", "Smoking History", "Alcohol Consumption", "Obesity BMI", "Diet Risk", "Physical Activity", "Diabetes", "Inflammatory Bowel Disease", "Genetic Mutation", " Screening History", "Early Detection", "Treatment Type", "Urban or Rural", "Insurance Status")
+my_list <- list()
+for (i in seq_along(categorical)) {
+  feat <- categorical[i]
+  feat_plot <- ggplot(balanced_data, aes_string(x = feat, fill = resp)) +
+    geom_bar(position = "fill", , alpha = 0.6) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    labs(
+      #title = paste("Mortality Proportion by", categorical_cols[i]),
+      x = categorical_cols[i],
+      y = "Proportion"
+    ) +
+    scale_fill_manual(values = c("blue", "red"), labels = c("Alive", "Dead")) +
+    guides(fill = guide_legend(title = "Mortality")) +
+    theme_minimal(base_size = 32) +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 36),
+      axis.title = element_text(size = 32),
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 28),
+      axis.text.y = element_text(size = 28),
+      legend.title = element_text(size = 30),
+      legend.text = element_text(size = 28)
+    )
+  
+  my_list[[i]] <- feat_plot
+}
+
+combined_plot <- do.call(arrangeGrob, c(my_list, ncol = 4))
+
+caption_grob <- textGrob("Appendix A: Proportion bar plots for all categorical variables by mortality status",
+                         gp = gpar(fontface = "bold.italic", fontsize = 48), 
+                         hjust = 0.5,
+                         vjust = 0.3)
+
+final_plot <- arrangeGrob(combined_plot, bottom = caption_grob)
+
+as.ggplot(final_plot)
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-height: 3
+#| fig-width: 6
 
 # Start with full model
 selected_vars <- setdiff(names(balanced_data), resp)
@@ -544,8 +733,8 @@ aic_plot <- ggplot(best_models, aes(x = Num_Covariates, y = AIC)) +
   scale_x_continuous(breaks = best_models$Num_Covariates)
 
 # Caption as a grob (bold + italic)
-caption_grob <- textGrob("Figure 6: AIC vs Number of Covariates – demonstrating backward feature selection.",
-                         gp = gpar(fontface = "bold.italic", fontsize = 9),
+caption_grob <- textGrob("Appendix B: AIC vs Number of Covariates – demonstrating backward feature selection.",
+                         gp = gpar(fontface = "bold.italic", fontsize = 10),
                          hjust = 0.5, vjust = 0.3)
 
 # Combine plot and caption
@@ -554,165 +743,6 @@ final_plot <- arrangeGrob(aic_plot, bottom = caption_grob)
 # Convert to ggplot object
 as.ggplot(final_plot)
 ```
-
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-
-# Fit full model
-full_model <- glm(Mortality ~., data = balanced_data, family = binomial)
-
-# Perform backward selection
-backward_model <- step(full_model, direction = "backward", trace = 0)
-
-# View summary of selected model
-summay_backward <- summary(backward_model)
-summary_full <- summary(full_model)
-```
-
-```{=latex}
-\begin{table}[ht]
-\centering
-\begin{tabular}{lcc}
-\hline
-\textbf{Model} & \textbf{Residual Deviance} & \textbf{AIC} \\
-\hline
-Full Model              & 9710.7 (df = 6997) & 9764.7 \\
-Backward-Selected Model & 9725.6 (df = 7019) & 9735.6 \\
-\hline
-\end{tabular}
-\caption{Residual Deviance and AIC between the backward-selected and full models}
-\label{tab:model_comparison}
-\end{table}
-```
-
-The backward selection was performed for finding the optimal number of covariates for predicting mortality from colorectal cancer. This method iteratively removes the least significant variables from the full logistic regression model and selects the best model at each step based on the Akaike Information Criterion (AIC). After selecting the best model of this study, the selected model is evaluated against the full model to confirm the optimal balance between model interpretability (likelihood) and complexity (number of covariates).
-
-Figure 6 illustrates how the AIC value changes during the backward selection process as variables are sequentially removed. Since the AIC preferred the smallest values, the lowest AIC was found in the plot when the number of covariates is 3, and also this process can lead to satisfy the principle of parsimony. Thus, the optimal model includes the following key predictors:
-
--   **Cancer Stage**
-
--   **Family History**
-
--   **Healthcare Costs**
-
-The AIC comparison between the full and backward selection models is summarized in Table 1. The full model, which includes all covariates, resulted in an AIC of 9764.7. In contrast, the optimal model has a lower AIC of 9735.6, indicating that the selected model provides a better balance between interpretability and complexity than the full model.
-
-### Statistical Analysis
-
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-
-# Add losing covarite of interest back to backward selected model
-reduced_additive_model <- glm(
-  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs + Early_Detection,
-  family = binomial, data = balanced_data
-  )
-
-# fit interaction term with two covariates of interest
-reduced_interaction_model <- glm(
-  formula = Mortality ~ Cancer_Stage + Family_History + Healthcare_Costs * Early_Detection,
-  family = binomial, data = balanced_data
-  )
-
-# Use ANOVA for goodness-of-fit test
-lrt_result <- anova(reduced_additive_model, reduced_interaction_model, test = "LRT")
-
-# Summary result for additive model
-result_additive <- summary(reduced_additive_model)
-```
-
-To clarify whether including the interaction terms would significantly improve our model's predictive performance, we conducted a likelihood ratio test based on Wilks’ theorem to compare the additive model against a model with interaction terms.
-
-\par
-
-We defined the hypothesis as follows:
-
--   Null hypothesis $H_0$: logistic regression of additive model is true model
-
--   Alternative hypothesis $H_a$: logistic regression of interaction model is true model
-
-    \par
-
-To perform the hypothesis testing, we set the significance level at 5% ($\alpha$ = 0.05) and the result of test statistic and corresponding p-value are summarized below:
-
-```{=latex}
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|c|c|c|}
-\hline
-\textbf{Test Statistic} & \textbf{Degrees of Freedom} & \textbf{p-value} \\
-\hline
-$\chi^2 = 0.549$ & 1 & 0.4586 \\
-\hline
-\end{tabular}
-\caption{Wilks' likelihood ratio test comparison for Additive and Interaction}
-\label{tab:wilks-lrt}
-\end{table}
-```
-
-In table 2, the observed p-value is 0.4586 and it is greater than our pre-specified significance level of $\alpha$ = 0.05. Thus, we fail to reject the null hypothesis and conclude that including interaction terms does not significantly improve model fit. Consequently, simpler additive model of this study ensures interpretability and prevents overfitting by the principle of parsimony.
-
-```{=latex}
-\begin{table}[ht]
-\centering
-\begin{tabular}{lrrrrl}
-\hline
-\textbf{Predictor} & \textbf{Estimate} & \textbf{Std. Error} & \textbf{z value} & \textbf{Pr($>|z|$)} & \textbf{Significance} \\
-\hline
-(Intercept)              & 0.2256713  & 0.0804475  & 2.805  & 0.00503  & ** \\
-Cancer\_StageMetastatic & -0.0707315 & 0.0648033  & -1.091 & 0.27506  &    \\
-Cancer\_StageRegional   & -0.1151017 & 0.0537461  & -2.142 & 0.03223  & *  \\
-Family\_HistoryYes      & -0.0817314 & 0.0520083  & -1.572 & 0.11607  &    \\
-Healthcare\_Costs       & -0.0018622 & 0.0008735  & -2.132 & 0.03301  & *  \\
-Early\_DetectionYes     & -0.0081611 & 0.0487565  & -0.167 & 0.86707  &    \\
-\hline
-\end{tabular}
-\caption{Regression output with significance levels: * p < 0.05, ** p < 0.01}
-\label{tab:regression_output}
-\end{table}
-```
-
-#### Results Interpretation
-
-Since the primary goal of this report was to evaluate how healthcare expenditures and early detection of colorectal cancer associated, so the final model included the covariate "Early Detection" with selected variables from the backward selection. To clarify whether including an interaction term between **Early Detection** and **Healthcare Costs** improves the model fit, additive model and one with the interaction term with two covariates model were conducted the likelihood ratio test (LRT) and the results in comparison of goodness of fit between an additive model and a model with an interaction term between the two covariates using ANOVA were summarized in Table 3.
-
--   **Cancer Stage (Regional):** Since the p-value of cancer stage at regional is statistically significant, thus we conclude that patients diagnosed at the regional stage have significantly lower odds of cancer mortality compared to the localized stage.
-
--   **Healthcare Cost:** The observed p-value is 0.03301, indicating inverse relationship with mortality and higher spending for patient may correspond to more effective treatments and better outcomes.
-
--   **Family History and Early Detection:** They are not statistically significant at the 5% level, but Early Detection was retained for the objectives of this study and its practical and theoretical role in influencing the early stage of cancer.
-
-## Conclusion
-
-### Main Findings
-
-This analysis identified colorectal cancer stage at diagnosis and patient health care costs as significant predictors of mortality from colorectal cancer. Specifically, mortality was much higher for advanced cancers (especially metastatic disease) compared to localized cancers, consistent with evidence that stage at diagnosis is the most important prognostic factor for colorectal cancer (Du Cancer, 2024). Higher healthcare expenditure was also significantly associated with mortality risk, which may reflect the intensive treatment needs and complications of advanced disease (Balkhi et al., 2023). In contrast, early detection status was not an independent predictor of mortality after controlling for cancer stage and other factors. This finding suggests that the benefits of early detection are mediated primarily through its impact on the diagnostic stage rather than providing an additional survival advantage (McPhail et al., 2015). These results emphasize the importance of early diagnosis of colorectal cancer in improving survival. Thus, the findings support the management of colorectal cancer patients through effective screening programs and allocating adequate healthcare resources to improve patient outcomes, emphasizing the importance of early detection.
-
-### Limitations
-
--   This observational study limits the ability to establish causal relationships between predictors and mortality outcomes.
-
--   Unmeasured confounders may also have affected the observed associations.
-
--   The analysis lacks variables that represent systemic and contextual factors that may influence outcomes, such as regional differences in health care services or socioeconomic status.
-
--   The variable “early detection” is defined very broadly (yes/no indicator of early detection), making its meaning somewhat ambiguous.
-
-### Potential Further research
-
-Future studies could use more in-depth analyses to validate and extend these findings and examine the impact of interventions. For example, survival analyses (e.g., using Cox proportional risk models) could incorporate time-to-event data to determine in greater detail when, not just if, death occurs (Collett, 2015).
-
-## Appendix
-
--   Full regression output
-
--   Extra plots or tables not essential to the main body
-
--   Model selection steps
 
 <!-- References -->
 
